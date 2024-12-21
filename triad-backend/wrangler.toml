@@ -1,0 +1,28 @@
+compatibility_date = "2024-12-20"
+compatibility_flags = ["nodejs_compat_v2"]
+main = "src/index.ts"
+name = "triad-backend"
+
+# [vars]
+# MY_VAR = "my-variable"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+[[d1_databases]]
+binding = "DB"
+database_id = "313b925d-927c-41df-a77f-04e0cb8a4163"
+database_name = "triad-db-prod"
+migrations_dir = "drizzle"
+
+# [ai]
+# binding = "AI"
+
+# [observability]
+# enabled = true
+# head_sampling_rate = 1
