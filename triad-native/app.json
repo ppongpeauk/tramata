@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "triad-native",
+    "slug": "triad-native",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "scheme": "triadnative",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ppongpeauk.triad-native",
+      "appleTeamId": "354DA25GVF"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-asset",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/splash-icon.png"
+        }
+      ],
+      "react-native-edge-to-edge",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3880eb06-5c67-4039-9ed0-c0a3fdb721a6"
+      }
+    }
+  }
+}
