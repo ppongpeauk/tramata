@@ -6,6 +6,13 @@ import LineSymbol from "@/components/line-symbol";
 import { lines } from "@/constants/lines";
 import { Station, StationTrainPrediction } from "@/types/station";
 import { useNavigation } from "@react-navigation/native";
+import Animated, {
+	useAnimatedStyle,
+	withRepeat,
+	withSequence,
+	withTiming,
+	Easing,
+} from "react-native-reanimated";
 
 export type StationTrainPredictionWithStation = StationTrainPrediction & {
 	station?: Station;
@@ -25,6 +32,31 @@ export default function PrimaryTrainButton({
 	if (!line) {
 		return null;
 	}
+
+	const isImminentArrival = train.min === "BRD" || train.min === "ARR";
+
+	const pulsingStyle = useAnimatedStyle(() => {
+		if (!isImminentArrival) {
+			return { opacity: 1 };
+		}
+
+		return {
+			opacity: withRepeat(
+				withSequence(
+					withTiming(0.5, {
+						duration: 500,
+						easing: Easing.inOut(Easing.ease),
+					}),
+					withTiming(1, {
+						duration: 500,
+						easing: Easing.inOut(Easing.ease),
+					})
+				),
+				-1, // Infinite repetition
+				true // Reverse animation
+			),
+		};
+	}, [isImminentArrival]);
 
 	return (
 		<TouchableOpacity
@@ -92,20 +124,15 @@ export default function PrimaryTrainButton({
 					</View>
 				)}
 			</View>
-			{/* {train.destinationName === "LastTrain" && (
-				<View className="flex-row items-center justify-center gap-1 bg-red-500 border-2 border-red-600 rounded-lg py-0.5 px-2">
-					<Text className="text-white" size="xs" weight="semiBold">
-						Last Train
-					</Text>
-				</View>
-			)} */}
-			<Text
-				className="text-text text-right ml-auto"
-				size="md"
-				weight="semiBold"
-			>
-				{train.min}
-			</Text>
+			<Animated.View style={pulsingStyle}>
+				<Text
+					className="text-text text-right ml-auto"
+					size="md"
+					weight="semiBold"
+				>
+					{train.min}
+				</Text>
+			</Animated.View>
 
 			<Ionicons
 				name="chevron-up"

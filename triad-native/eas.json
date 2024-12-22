@@ -16,6 +16,12 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+				"appleId": "ppongpeauk@gmail.com",
+				"ascAppId": "6737857366",
+				"appleTeamId": "354DA25GVF"
+			}
+    }
   }
 }

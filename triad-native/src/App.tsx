@@ -2,6 +2,7 @@ import { Assets as NavigationAssets } from "@react-navigation/elements";
 import { Asset } from "expo-asset";
 import * as SplashScreen from "expo-splash-screen";
 import * as React from "react";
+import { useEffect } from "react";
 import { Navigation } from "./navigation";
 import "./global.css";
 import { useColorScheme } from "nativewind";
@@ -16,6 +17,7 @@ import {
 } from "react-native-reanimated";
 import { TrainWebsocketProvider } from "./contexts/train-ws";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { registerForPushNotificationsAsync } from "./services/notifications";
 
 configureReanimatedLogger({
 	level: ReanimatedLogLevel.warn,
@@ -36,9 +38,19 @@ export function App() {
 	const [fontsLoaded] = useFonts(customFontsToLoad);
 	const { colorScheme } = useColorScheme();
 
+	useEffect(() => {
+		const getToken = async () => {
+			const token = await registerForPushNotificationsAsync();
+			console.log("Push notification token:", token);
+		};
+
+		getToken();
+	}, []);
+
 	if (!fontsLoaded) {
 		return null;
 	}
+
 	return (
 		<QueryClientProvider client={queryClient}>
 			<TrainWebsocketProvider>

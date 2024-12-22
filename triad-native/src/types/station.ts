@@ -1,3 +1,19 @@
+export type StationParking = {
+	code: string;
+	notes: string | null;
+	allDayParking?: {
+		totalCount: number;
+		riderCost: number;
+		nonRiderCost: number;
+		saturdayRiderCost: number;
+		saturdayNonRiderCost: number;
+	};
+	shortTermParking?: {
+		totalCount: number;
+		notes: string;
+	};
+};
+
 export type Station = {
 	code: string;
 	name: string;
@@ -17,6 +33,7 @@ export type Station = {
 	};
 	predictions?: StationTrainPrediction[];
 	outages?: StationOutage[];
+	parking?: StationParking;
 };
 
 export type StationTrainPrediction = {

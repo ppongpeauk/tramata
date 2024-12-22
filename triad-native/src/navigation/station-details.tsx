@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Text } from "@/components/ui/Text";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect } from "react";
 import { api } from "@/utils/web";
 import {
 	TabBarProps,
@@ -31,6 +31,7 @@ import { Station } from "@/types/station";
 import PrimaryTrainButton, {
 	StationTrainPredictionWithStation,
 } from "@/components/primary-train-button";
+import { useQuery } from "@tanstack/react-query";
 
 export type TabDefinition = {
 	label: string;
@@ -43,12 +44,12 @@ export type TabName = TabDefinition["value"];
 
 function ArrivalsTab({
 	station,
-	onRefresh,
 	refreshing,
+	onRefresh,
 }: {
 	station: Station;
-	onRefresh: () => void;
 	refreshing: boolean;
+	onRefresh: () => void;
 }) {
 	if (!station?.predictions?.length) {
 		return (
@@ -93,12 +94,12 @@ function ArrivalsTab({
 
 function OutagesTab({
 	station,
-	onRefresh,
 	refreshing,
+	onRefresh,
 }: {
 	station: Station;
-	onRefresh: () => void;
 	refreshing: boolean;
+	onRefresh: () => void;
 }) {
 	const navigation = useNavigation();
 	if (!station?.outages || station.outages.length === 0) {
@@ -173,8 +174,19 @@ export default function StationDetails() {
 		title: string;
 		line: any;
 	};
-	const [refreshing, setRefreshing] = useState(true);
-	const [stationData, setStationData] = useState<Station | null>(null);
+
+	const {
+		data: stationData,
+		isLoading,
+		refetch,
+	} = useQuery({
+		queryKey: ["station", id],
+		queryFn: async () => {
+			const response = await api.get(`/v1/stations/${id}`);
+			return response.data as Station;
+		},
+		refetchInterval: 1000 * 15,
+	});
 
 	const TAB_DEFINITIONS: Record<TabName, TabDefinition> = {
 		eta: {
@@ -190,13 +202,6 @@ export default function StationDetails() {
 			alerts: stationData?.outages?.length || undefined,
 			component: OutagesTab,
 		},
-	};
-
-	const fetchStationData = async () => {
-		setRefreshing(true);
-		const response = await api.get(`/v1/stations/${id}`);
-		setStationData(response.data);
-		setRefreshing(false);
 	};
 
 	useLayoutEffect(() => {
@@ -230,11 +235,7 @@ export default function StationDetails() {
 		} as NativeStackNavigationOptions);
 	}, [title, stationData]);
 
-	useEffect(() => {
-		fetchStationData();
-	}, []);
-
-	if (refreshing && !stationData) {
+	if (isLoading && !stationData) {
 		return (
 			<View className="flex-1 items-center justify-center">
 				<ActivityIndicator size="large" />
@@ -258,8 +259,8 @@ export default function StationDetails() {
 						key={tab.value}
 					>
 						<tab.component
-							refreshing={refreshing}
-							onRefresh={fetchStationData}
+							refreshing={isLoading}
+							onRefresh={refetch}
 							station={stationData}
 						/>
 					</Tabs.Tab>

@@ -10,8 +10,13 @@
     "scheme": "hypermata",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ppongpeauk.hypermata",
-      "appleTeamId": "354DA25GVF"
+      "bundleIdentifier": "com.hoolamox.hypermata",
+      "appleTeamId": "354DA25GVF",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,8 +24,6 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
@@ -50,8 +53,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "3880eb06-5c67-4039-9ed0-c0a3fdb721a6"
+        "projectId": "95b265c1-8c30-4ad2-a89e-b637a81f23af"
       }
-    }
+    },
+    "owner": "ppongpeauk"
   }
 }
