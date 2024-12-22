@@ -1,5 +1,5 @@
 /**
- * @author Pete Pongpeauk
+ * @author Pete Pongpeauk <ppongpeauk@gmail.com>
  * 12-21-2024
  */
 
@@ -7,7 +7,7 @@ import { wmataApi } from "@/utils/web";
 import { BaseModel } from "./BaseModel.model";
 import { Station, StationModel } from "./Station.model";
 import { getCachedObject, setCachedObject } from "@/utils/cache";
-import { Track, TrackModel } from "./Track.model";
+import { TrackModel } from "./Track.model";
 
 export type APILine = {
 	LineCode: string;

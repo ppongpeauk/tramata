@@ -4,12 +4,21 @@ import { Ionicons } from "@/components/VectorIcons";
 import { Ionicons as NativeIonicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
+export type MoreItem = {
+	icon: keyof typeof NativeIonicons.glyphMap;
+	title: string;
+	subtitle?: string;
+	hideChevron?: boolean;
+	onPress: () => void;
+	emergency?: boolean;
+};
+
 export default function More() {
 	const navigation = useNavigation();
 	return (
 		<FlatList
-			className="flex-1 w-full py-8"
-			contentContainerClassName="border-y border-border"
+			className="flex-1 w-full"
+			// contentContainerClassName="border-y border-border"
 			ItemSeparatorComponent={() => (
 				<View className="h-[1px] bg-border" />
 			)}
@@ -18,18 +27,21 @@ export default function More() {
 					icon: "information-circle",
 					title: "About This App",
 					onPress: () => {
-						navigation.navigate("about" as never);
+						navigation.navigate("AboutApp");
 					},
 				},
 				{
-					icon: "call",
-					title: "Call Metro Transit Police (Emergencies Only)",
-					subtitle: "Call 202-962-2121 or Text 696873",
+					icon: "sparkles",
+					title: "Get Tramata Pro",
 					onPress: () => {},
-					emergency: true,
+				},
+				{
+					icon: "alert-circle",
+					title: "Report an Issue",
+					onPress: () => {},
 				},
 			]}
-			renderItem={({ item }) => (
+			renderItem={({ item }: { item: MoreItem }) => (
 				<MainButton
 					icon={item.icon as any}
 					title={item.title}
@@ -61,6 +73,7 @@ function MainButton({
 		<TouchableOpacity
 			activeOpacity={0.5}
 			className="flex flex-row items-center gap-3 bg-white dark:bg-neutral-950 py-4 px-4"
+			onPress={onPress}
 		>
 			<Ionicons
 				name={icon as any}

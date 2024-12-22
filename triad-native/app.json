@@ -1,23 +1,30 @@
 {
   "expo": {
-    "name": "triad-native",
-    "slug": "triad-native",
+    "name": "Hypermata",
+    "slug": "hypermata",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "scheme": "triadnative",
+    "scheme": "hypermata",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ppongpeauk.triad-native",
+      "bundleIdentifier": "com.ppongpeauk.hypermata",
       "appleTeamId": "354DA25GVF"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.ppongpeauk.tramata"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -30,6 +37,12 @@
         {
           "backgroundColor": "#ffffff",
           "image": "./assets/splash-icon.png"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to find nearby trains and stations."
         }
       ],
       "react-native-edge-to-edge",

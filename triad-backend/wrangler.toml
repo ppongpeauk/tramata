@@ -20,6 +20,14 @@ database_id = "313b925d-927c-41df-a77f-04e0cb8a4163"
 database_name = "triad-db-prod"
 migrations_dir = "drizzle"
 
+[[durable_objects.bindings]]
+class_name = "TrainData"
+name = "TRAIN_DATA"
+
+[[migrations]]
+new_classes = ["TrainData"]
+tag = "v1"
+
 # [ai]
 # binding = "AI"
 

@@ -1,6 +1,11 @@
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import {
+	ActivityIndicator,
+	ScrollView,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import { Text } from "@/components/ui/Text";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { lines } from "@/constants/lines";
 import LineSymbol from "@/components/line-symbol";
@@ -63,7 +68,7 @@ export default function Line() {
 							}
 						>
 							<Ionicons
-								name="information-circle"
+								name="information-circle-outline"
 								size={24}
 								className="text-text"
 							/>
@@ -73,6 +78,14 @@ export default function Line() {
 			},
 		} as NativeStackNavigationOptions);
 	}, [navigation]);
+
+	if (isLoading && !lineData) {
+		return (
+			<View className="flex-1 items-center justify-center">
+				<ActivityIndicator size="large" />
+			</View>
+		);
+	}
 
 	return (
 		<ScrollView className="flex-1 py-8">

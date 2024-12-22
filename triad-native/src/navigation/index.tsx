@@ -5,40 +5,46 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
-import Home from "./home";
+import Home, { HomeStack } from "./home";
 import More from "./more";
-import Lines from "./lines";
 import Line from "./line";
-import { Text } from "@/components/ui/Text";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity } from "react-native";
 import LineAlerts from "./line-alerts";
 import StationDetails from "./station-details";
+import StationOutage from "./station-outage";
+import SystemMap from "./system-map";
+import AboutApp from "./more/about-app";
+import Discover, { DiscoverStack } from "./discover";
+import StationInfo from "./station-info";
+import TrainDetails from "./train-details";
+
 const HomeTabs = createBottomTabNavigator({
 	screens: {
 		Home: {
-			screen: Home,
+			screen: HomeStack,
 			options: {
 				title: "Home",
+				headerShown: false,
 				tabBarIcon: ({ color, size }) => (
 					<Ionicons name="home" size={size} color={color} />
 				),
 			},
 		},
-		Lines: {
-			screen: Lines,
+		Discover: {
+			screen: DiscoverStack,
 			options: {
-				title: "Lines",
+				headerShown: false,
 				tabBarIcon: ({ color, size }) => (
-					<Ionicons name="git-branch" size={size} color={color} />
+					<Ionicons name="search" size={size} color={color} />
 				),
 			},
 		},
-		Saved: {
+		Status: {
 			screen: Home,
 			options: {
-				title: "Saved",
+				title: "Status",
 				tabBarIcon: ({ color, size }) => (
-					<Ionicons name="heart" size={size} color={color} />
+					<Ionicons name="pulse" size={size} color={color} />
 				),
 			},
 		},
@@ -46,7 +52,7 @@ const HomeTabs = createBottomTabNavigator({
 			screen: More,
 			options: {
 				tabBarIcon: ({ color, size }) => (
-					<Ionicons name="add-circle" size={size} color={color} />
+					<Ionicons name="menu" size={size} color={color} />
 				),
 			},
 		},
@@ -60,6 +66,12 @@ const RootStack = createNativeStackNavigator({
 			options: {
 				title: "Home",
 				headerShown: false,
+			},
+		},
+		AboutApp: {
+			screen: AboutApp,
+			options: {
+				title: "About This App",
 			},
 		},
 		More: {
@@ -100,6 +112,36 @@ const RootStack = createNativeStackNavigator({
 			options: ({ navigation }) => ({
 				title: "Station Details",
 				headerShown: true,
+			}),
+		},
+		StationInfo: {
+			screen: StationInfo,
+			options: ({ navigation }) => ({
+				title: "Station Info",
+				headerShown: true,
+			}),
+		},
+		StationOutage: {
+			screen: StationOutage,
+			options: ({ navigation }) => ({
+				title: "Outage Details",
+				headerShown: true,
+				presentation: "modal",
+			}),
+		},
+		SystemMap: {
+			screen: SystemMap,
+			options: ({ navigation }) => ({
+				title: "System Map",
+				headerShown: true,
+			}),
+		},
+		TrainDetails: {
+			screen: TrainDetails,
+			options: ({ navigation }) => ({
+				title: "Train Details",
+				headerShown: true,
+				presentation: "modal",
 			}),
 		},
 	},

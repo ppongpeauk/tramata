@@ -57,6 +57,7 @@ export default function LineView({
 						navigation.navigate("StationDetails", {
 							id: station.code,
 							title: station.name,
+							line: line,
 						} as never);
 					}}
 				>
