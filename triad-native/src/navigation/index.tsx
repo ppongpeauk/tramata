@@ -14,7 +14,7 @@ import StationDetails from "./station-details";
 import StationOutage from "./station-outage";
 import SystemMap from "./system-map";
 import AboutApp from "./more/about-app";
-import Discover, { DiscoverStack } from "./discover";
+import { DiscoverStack } from "./discover";
 import StationInfo from "./station-info";
 import TrainDetails from "./train-details";
 
@@ -24,6 +24,7 @@ const HomeTabs = createBottomTabNavigator({
 			screen: HomeStack,
 			options: {
 				title: "Home",
+				headerTitle: "Home",
 				headerShown: false,
 				tabBarIcon: ({ color, size }) => (
 					<Ionicons name="home" size={size} color={color} />
@@ -33,6 +34,8 @@ const HomeTabs = createBottomTabNavigator({
 		Discover: {
 			screen: DiscoverStack,
 			options: {
+				title: "Discover",
+				headerTitle: "Discover",
 				headerShown: false,
 				tabBarIcon: ({ color, size }) => (
 					<Ionicons name="search" size={size} color={color} />
@@ -43,6 +46,8 @@ const HomeTabs = createBottomTabNavigator({
 			screen: Home,
 			options: {
 				title: "Status",
+				headerTitle: "Status",
+				headerShown: false,
 				tabBarIcon: ({ color, size }) => (
 					<Ionicons name="pulse" size={size} color={color} />
 				),
@@ -51,6 +56,9 @@ const HomeTabs = createBottomTabNavigator({
 		More: {
 			screen: More,
 			options: {
+				title: "More",
+				headerTitle: "More",
+				headerShown: false,
 				tabBarIcon: ({ color, size }) => (
 					<Ionicons name="menu" size={size} color={color} />
 				),
@@ -64,7 +72,7 @@ const RootStack = createNativeStackNavigator({
 		HomeTabs: {
 			screen: HomeTabs,
 			options: {
-				title: "Home",
+				title: "HomeStack",
 				headerShown: false,
 			},
 		},
@@ -81,7 +89,7 @@ const RootStack = createNativeStackNavigator({
 		Line: {
 			screen: Line,
 			initialParams: {
-				id: null,
+				code: "RD",
 			},
 			options: ({ navigation }) => ({
 				headerShown: true,

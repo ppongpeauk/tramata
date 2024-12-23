@@ -52,8 +52,8 @@ export default function PrimaryTrainButton({
 						easing: Easing.inOut(Easing.ease),
 					})
 				),
-				-1, // Infinite repetition
-				true // Reverse animation
+				-1,
+				true
 			),
 		};
 	}, [isImminentArrival]);

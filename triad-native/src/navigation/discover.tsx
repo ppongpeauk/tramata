@@ -93,7 +93,7 @@ function LineButton({ item }: { item: (typeof lines)[number] }) {
 			onPress={() => {
 				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 				navigation.navigate("Line", {
-					id: item.id,
+					code: item.abbr,
 				} as never);
 			}}
 		>

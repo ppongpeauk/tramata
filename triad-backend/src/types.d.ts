@@ -14,6 +14,7 @@ export type GenericHono = {
 		WMATA_API_SECONDARY_KEY: string;
 		DB: D1Database;
 		TRAIN_DATA: DurableObjectNamespace<TrainData>;
+		KV: KVNamespace;
 	};
 };
 export type ContextHono = Context<GenericHono>;

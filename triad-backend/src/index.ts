@@ -9,6 +9,7 @@ import {
 	trainDataMiddleware,
 } from "./middleware";
 import { TrainData } from "@/durableObjects/websocket";
+import v2 from "./routes/v2";
 
 const app = new OpenAPIHono<GenericHono>();
 
@@ -28,6 +29,7 @@ app.use(dbMiddleware);
 app.use(trainDataMiddleware);
 
 app.route("/v1", v1);
+app.route("/v2", v2);
 
 /**
  * Documentation
@@ -36,7 +38,7 @@ app.doc("/doc", {
 	openapi: "3.0.0",
 	info: {
 		version: "1.0.0",
-		title: "Tramata Documentation",
+		title: "Hypermata Documentation",
 	},
 });
 app.use(

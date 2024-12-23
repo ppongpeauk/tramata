@@ -1,6 +1,6 @@
 import { TouchableOpacity, View } from "react-native";
 import { StationOutage } from "@/types/station";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { Ionicons } from "@/components/VectorIcons";
@@ -42,11 +42,26 @@ export default function OutageDetails() {
 		} as NativeStackNavigationOptions);
 	}, [navigation, data]);
 
+	const makeOutageDescription = useMemo(() => {
+		const includesGarage = data.locationDescription
+			.toLowerCase()
+			.includes("garage");
+
+		if (includesGarage) {
+			return `The parking garage elevator at ${
+				data.stationName
+			} is out for ${data.symptomDescription.toLowerCase()}.`;
+		}
+
+		return `${data.locationDescription} at ${
+			data.stationName
+		} is out for ${data.symptomDescription.toLowerCase()}.`;
+	}, [data]);
+
 	return (
 		<View className="flex-1 items-start my-6 px-4 gap-2">
 			<Text weight="semiBold" size="md" className="text-text text-left">
-				{data.locationDescription} at {data.stationName} is out for{" "}
-				{data.symptomDescription.toLowerCase()}.
+				{makeOutageDescription}
 			</Text>
 			<Text
 				weight="medium"

@@ -9,9 +9,9 @@ cpu_ms = 4000
 # [vars]
 # MY_VAR = "my-variable"
 
-# [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+[[kv_namespaces]]
+binding = "KV"
+id = "3046170811b944e89778e8daa86e04db"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"

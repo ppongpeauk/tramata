@@ -17,8 +17,8 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 
 export default function Line() {
 	const navigation = useNavigation();
-	const { id } = useRoute().params as { id: string };
-	const line = lines.find((line) => line.id === id);
+	const { code } = useRoute().params as { code: string };
+	const line = lines.find((line) => line.abbr === code);
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [lineData, setLineData] = useState<LineData | null>(null);
@@ -48,7 +48,7 @@ export default function Line() {
 						<LineSymbol line={line as never} />
 						<View>
 							<Text className="text-text" size="md" weight="bold">
-								{line?.title} Line
+								{line?.title}
 							</Text>
 							{/* <Text className="text-text" size="xs">
 								{line?.stationStart} - {line?.stationEnd}

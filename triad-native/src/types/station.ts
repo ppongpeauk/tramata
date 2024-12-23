@@ -17,22 +17,21 @@ export type StationParking = {
 export type Station = {
 	code: string;
 	name: string;
-	stationTogether1: string;
-	stationTogether2: string;
-	lineCode1: string;
-	lineCode2?: string;
-	lineCode3?: string;
-	lineCode4?: string;
 	lat: number;
 	lon: number;
+	lineCode1: string;
+	lineCode2: string;
+	lineCode3: string;
+	lineCode4: string;
 	address: {
 		street: string;
 		city: string;
 		state: string;
 		zip: string;
 	};
-	predictions?: StationTrainPrediction[];
 	outages?: StationOutage[];
+	predictions?: StationTrainPrediction[];
+	lines: string[];
 	parking?: StationParking;
 };
 

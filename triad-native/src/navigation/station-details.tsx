@@ -32,6 +32,7 @@ import PrimaryTrainButton, {
 	StationTrainPredictionWithStation,
 } from "@/components/primary-train-button";
 import { useQuery } from "@tanstack/react-query";
+import LineSymbol from "@/components/line-symbol";
 
 export type TabDefinition = {
 	label: string;
@@ -41,130 +42,6 @@ export type TabDefinition = {
 	component: React.ComponentType<any>;
 };
 export type TabName = TabDefinition["value"];
-
-function ArrivalsTab({
-	station,
-	refreshing,
-	onRefresh,
-}: {
-	station: Station;
-	refreshing: boolean;
-	onRefresh: () => void;
-}) {
-	if (!station?.predictions?.length) {
-		return (
-			<View className="flex-1 items-center justify-center">
-				<Text className="text-text" weight="semiBold" size="md">
-					No arrivals at this time.
-				</Text>
-			</View>
-		);
-	}
-
-	return (
-		<Tabs.FlatList
-			data={station.predictions}
-			ItemSeparatorComponent={() => (
-				<View className="h-[1px] bg-border" />
-			)}
-			refreshControl={
-				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-			}
-			renderItem={({ item, index }) => {
-				const line = lines.find((line) => line.abbr === item.line);
-				if (!line) {
-					return null;
-				}
-
-				return (
-					<PrimaryTrainButton
-						lineAbbr={item.line}
-						train={
-							{
-								...item,
-							} as StationTrainPredictionWithStation
-						}
-						key={index}
-					/>
-				);
-			}}
-		/>
-	);
-}
-
-function OutagesTab({
-	station,
-	refreshing,
-	onRefresh,
-}: {
-	station: Station;
-	refreshing: boolean;
-	onRefresh: () => void;
-}) {
-	const navigation = useNavigation();
-	if (!station?.outages || station.outages.length === 0) {
-		return (
-			<View className="flex-1 items-center justify-center">
-				<Text className="text-text" weight="semiBold" size="md">
-					No outages at this time.
-				</Text>
-			</View>
-		);
-	}
-
-	return (
-		<Tabs.FlatList
-			data={station.outages}
-			ItemSeparatorComponent={() => (
-				<View className="h-[1px] bg-border" />
-			)}
-			refreshControl={
-				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-			}
-			renderItem={({ item, index }) => {
-				return (
-					<TouchableOpacity
-						key={index}
-						className="flex-row bg-primary dark:bg-background items-center justify-start gap-2 p-4"
-						onPress={() => {
-							navigation.navigate("StationOutage", {
-								data: item,
-							} as never);
-						}}
-					>
-						<OutageUnitSymbol
-							unitType={item.unitType || "ESCALATOR"}
-						/>
-						<View>
-							<Text
-								className="text-text"
-								weight="semiBold"
-								size="sm"
-							>
-								{item.unitType === "ESCALATOR"
-									? "Escalator"
-									: "Elevator"}{" "}
-								Outage
-							</Text>
-							<Text
-								className="text-text-secondary"
-								weight="medium"
-								size="xs"
-							>
-								{item.symptomDescription}
-							</Text>
-						</View>
-						<Ionicons
-							name="chevron-forward-outline"
-							size={16}
-							className="text-text-secondary ml-auto"
-						/>
-					</TouchableOpacity>
-				);
-			}}
-		/>
-	);
-}
 
 export default function StationDetails() {
 	const navigation = useNavigation();
@@ -363,5 +240,129 @@ export function StationTabs({
 				className="bg-text"
 			/>
 		</View>
+	);
+}
+
+function ArrivalsTab({
+	station,
+	refreshing,
+	onRefresh,
+}: {
+	station: Station;
+	refreshing: boolean;
+	onRefresh: () => void;
+}) {
+	if (!station?.predictions?.length) {
+		return (
+			<View className="flex-1 items-center justify-center">
+				<Text className="text-text" weight="semiBold" size="md">
+					No arrivals at this time.
+				</Text>
+			</View>
+		);
+	}
+
+	return (
+		<Tabs.FlatList
+			data={station.predictions}
+			ItemSeparatorComponent={() => (
+				<View className="h-[1px] bg-border" />
+			)}
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}
+			renderItem={({ item, index }) => {
+				const line = lines.find((line) => line.abbr === item.line);
+				if (!line) {
+					return null;
+				}
+
+				return (
+					<PrimaryTrainButton
+						lineAbbr={item.line}
+						train={
+							{
+								...item,
+							} as StationTrainPredictionWithStation
+						}
+						key={index}
+					/>
+				);
+			}}
+		/>
+	);
+}
+
+function OutagesTab({
+	station,
+	refreshing,
+	onRefresh,
+}: {
+	station: Station;
+	refreshing: boolean;
+	onRefresh: () => void;
+}) {
+	const navigation = useNavigation();
+	if (!station?.outages || station.outages.length === 0) {
+		return (
+			<View className="flex-1 items-center justify-center">
+				<Text className="text-text" weight="semiBold" size="md">
+					No outages at this time.
+				</Text>
+			</View>
+		);
+	}
+
+	return (
+		<Tabs.FlatList
+			data={station.outages}
+			ItemSeparatorComponent={() => (
+				<View className="h-[1px] bg-border" />
+			)}
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}
+			renderItem={({ item, index }) => {
+				return (
+					<TouchableOpacity
+						key={index}
+						className="flex-row bg-primary dark:bg-background items-center justify-start gap-2 p-4"
+						onPress={() => {
+							navigation.navigate("StationOutage", {
+								data: item,
+							} as never);
+						}}
+					>
+						<OutageUnitSymbol
+							unitType={item.unitType || "ESCALATOR"}
+						/>
+						<View>
+							<Text
+								className="text-text"
+								weight="semiBold"
+								size="sm"
+							>
+								{item.unitType === "ESCALATOR"
+									? "Escalator"
+									: "Elevator"}{" "}
+								Outage
+							</Text>
+							<Text
+								className="text-text-secondary"
+								weight="medium"
+								size="xs"
+							>
+								{item.symptomDescription}
+							</Text>
+						</View>
+						<Ionicons
+							name="chevron-forward-outline"
+							size={16}
+							className="text-text-secondary ml-auto"
+						/>
+					</TouchableOpacity>
+				);
+			}}
+		/>
 	);
 }

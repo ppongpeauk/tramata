@@ -20,9 +20,7 @@ export default function SystemMap() {
 	if (!mapUri) {
 		return (
 			<View className="flex-1 items-center justify-center">
-				<Text className="text-text" weight="bold" size="lg">
-					Loading map...
-				</Text>
+				<ActivityIndicator size="large" />
 			</View>
 		);
 	}

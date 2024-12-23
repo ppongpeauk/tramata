@@ -57,11 +57,6 @@
     <string>Allow $(PRODUCT_NAME) to find nearby trains and stations.</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
-    <key>NSLocationTemporaryUsageDescriptionDictionary</key>
-    <dict>
-      <key>FindStations</key>
-      <string>$(PRODUCT_NAME) uses your location to find nearby stations.</string>
-    </dict>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>UIBackgroundModes</key>

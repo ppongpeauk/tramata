@@ -1,4 +1,4 @@
-import { Station } from "@/types/station";
+import { Station, StationParking } from "@/types/station";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
 	ScrollView,
@@ -51,7 +51,7 @@ function Section({
 	);
 }
 
-function ParkingSection({ parking }: { parking: Station["parking"] }) {
+function ParkingSection({ parking }: { parking: StationParking }) {
 	if (!parking?.allDayParking && !parking?.shortTermParking) {
 		return (
 			<Section title="Parking">
@@ -77,29 +77,36 @@ function ParkingSection({ parking }: { parking: Station["parking"] }) {
 					</Text>
 					<InfoRow
 						label="Total Spaces"
-						value={parking.allDayParking.totalCount}
+						value={parking.allDayParking.totalCount ?? "N/A"}
 					/>
 					<InfoRow
 						label="Metro Rider Cost"
-						value={`$${parking.allDayParking.riderCost.toFixed(2)}`}
+						value={`$${
+							parking.allDayParking.riderCost?.toFixed(2) ?? "N/A"
+						}`}
 					/>
 					<InfoRow
 						label="Non-Rider Cost"
-						value={`$${parking.allDayParking.nonRiderCost.toFixed(
-							2
-						)}`}
+						value={`$${
+							parking.allDayParking.nonRiderCost?.toFixed(2) ??
+							"N/A"
+						}`}
 					/>
 					<InfoRow
 						label="Saturday Rider Cost"
-						value={`$${parking.allDayParking.saturdayRiderCost.toFixed(
-							2
-						)}`}
+						value={`$${
+							parking.allDayParking.saturdayRiderCost?.toFixed(
+								2
+							) ?? "N/A"
+						}`}
 					/>
 					<InfoRow
 						label="Saturday Non-Rider Cost"
-						value={`$${parking.allDayParking.saturdayNonRiderCost.toFixed(
-							2
-						)}`}
+						value={`$${
+							parking.allDayParking.saturdayNonRiderCost?.toFixed(
+								2
+							) ?? "N/A"
+						}`}
 					/>
 				</View>
 			)}
@@ -147,7 +154,8 @@ function MapPreview({ station }: { station: Station }) {
 		<Section title="Location">
 			<TouchableOpacity
 				onPress={() => Linking.openURL(mapsUrl)}
-				className="overflow-hidden rounded-lg mb-3"
+				className="overflow-hidden rounded-lg mb-3 border border-border"
+				activeOpacity={0.5}
 			>
 				<MapView
 					provider={PROVIDER_DEFAULT}
@@ -171,18 +179,15 @@ function MapPreview({ station }: { station: Station }) {
 				</MapView>
 			</TouchableOpacity>
 			<TouchableOpacity
-				className="flex-row items-center justify-between bg-secondary dark:bg-secondary-dark p-3 rounded-lg"
+				className="flex-row items-center justify-between border border-border p-3 rounded-lg"
 				onPress={() => Linking.openURL(mapsUrl)}
+				activeOpacity={0.5}
 			>
-				<Text className="text-text flex-1 mr-4" weight="medium">
+				<Text className="text-text flex-1 mr-4" weight="bold">
 					{station.address.street}, {station.address.city},{" "}
 					{station.address.state} {station.address.zip}
 				</Text>
-				<Ionicons
-					name="navigate-outline"
-					size={24}
-					className="text-text"
-				/>
+				<Ionicons name="navigate" size={24} className="text-text" />
 			</TouchableOpacity>
 		</Section>
 	);
@@ -203,7 +208,14 @@ function LinesSection({ station }: { station: Station }) {
 					const line = lines.find((l) => l.abbr === lineCode);
 					if (!line) return null;
 
-					return <LineSymbol line={line} size="lg" key={lineCode} />;
+					return (
+						<LineSymbol
+							line={line}
+							size="lg"
+							pressable={true}
+							key={lineCode}
+						/>
+					);
 				})}
 			</View>
 		</Section>
@@ -232,7 +244,6 @@ export default function StationInfo() {
 		navigation.setOptions({
 			headerBackButtonDisplayMode: "minimal",
 			title: station.name,
-			headerShadowVisible: false,
 		} as NativeStackNavigationOptions);
 	}, [station]);
 
@@ -246,7 +257,7 @@ export default function StationInfo() {
 			<View className="p-4">
 				<LinesSection station={station} />
 				<MapPreview station={station} />
-				<ParkingSection parking={station.parking} />
+				<ParkingSection parking={station.parking as StationParking} />
 			</View>
 		</ScrollView>
 	);

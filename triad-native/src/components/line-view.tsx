@@ -1,7 +1,7 @@
 import { TouchableOpacity, View } from "react-native";
 import { lines } from "@/constants/lines";
 import { Text } from "@/components/ui/Text";
-import { Ionicons } from "./VectorIcons";
+import { Ionicons, MaterialCommunityIcons } from "./VectorIcons";
 import { useNavigation } from "@react-navigation/native";
 
 export type LineData = {
@@ -28,6 +28,21 @@ export type LineData = {
 			state: string;
 			zip: string;
 		};
+		outages: {
+			unitName: string;
+			unitType: "ESCALATOR" | "ELEVATOR";
+			unitStatus: string | null;
+			stationCode: string;
+			stationName: string;
+			locationDescription: string;
+			symptomCode: string | null;
+			timeOutOfService: string;
+			symptomDescription: string;
+			displayOrder: number;
+			dateOutOfServ: string;
+			dateUpdated: string;
+			estimatedReturnToService: string;
+		}[];
 	}[];
 	tracks: {
 		seqNum: number;
@@ -49,6 +64,14 @@ export default function LineView({
 }) {
 	const navigation = useNavigation();
 	const stationComponents = data?.stations.map((station, index) => {
+		const outages = station.outages;
+		const hasElevator = outages.some(
+			(outage) => outage.unitType === "ELEVATOR"
+		);
+		const hasEscalator = outages.some(
+			(outage) => outage.unitType === "ESCALATOR"
+		);
+
 		return (
 			<View className="flex-row flex-1 items-center" key={index}>
 				<TouchableOpacity
@@ -65,7 +88,7 @@ export default function LineView({
 						className={`border-4 ${line.borderColor} bg-white dark:bg-background h-8 w-8 rounded-full`}
 					/>
 				</TouchableOpacity>
-				<View className="absolute flex-col items-end ml-40">
+				<View className="absolute flex-col items-end ml-auto left-40 flex-shrink">
 					<Text
 						className="text-text max-w-40"
 						size="sm"
@@ -73,6 +96,24 @@ export default function LineView({
 					>
 						{station.name}
 					</Text>
+					<View className="flex-row mr-auto">
+						{hasElevator && (
+							<MaterialCommunityIcons
+								name="elevator"
+								size={24}
+								className="text-red-500"
+							/>
+						)}
+						{hasEscalator && (
+							<View className="flex-row items-center justify-center">
+								<MaterialCommunityIcons
+									name="escalator"
+									size={24}
+									className="text-red-500"
+								/>
+							</View>
+						)}
+					</View>
 				</View>
 			</View>
 		);
@@ -107,7 +148,7 @@ export default function LineView({
 			</View>
 			{/* Center Pole */}
 			<View
-				className={`flex items-center ${line.color} border ${line.borderColor} h-fit w-4 rounded-full mx-8 py-8 mb-32 gap-12`}
+				className={`flex items-center ${line.color} border ${line.borderColor} h-fit w-4 rounded-full mx-8 py-8 mb-32 gap-16`}
 			>
 				{stationComponents}
 			</View>

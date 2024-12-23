@@ -9,9 +9,22 @@ const TTL_MAX = 60 * 60 * 24 * 30; // 30 days
  * Get a value from the cache.
  * @param ctx - The context object.
  * @param key - The key to get the value for.
+ * @param useKV - Whether to use the KV store instead of the database.
  * @returns The cached value or null if it doesn't exist.
  */
-export async function getCachedObject(ctx: ContextHono, key: string) {
+export async function getCachedObject(
+	ctx: ContextHono,
+	key: string,
+	useKV: boolean = false
+) {
+	if (useKV) {
+		const kv = ctx.env.KV;
+		const cache = await kv.get(key);
+		if (!cache) {
+			return null;
+		}
+		return cache;
+	}
 	const db = ctx.get("db");
 	const cache = await db.query.cachedObjects.findFirst({
 		where: eq(schema.cachedObjects.key, key),
@@ -40,8 +53,15 @@ export async function setCachedObject(
 	ctx: ContextHono,
 	key: string,
 	data: any,
-	ttl: number
+	ttl = TTL_DEFAULT,
+	useKV = false
 ) {
+	if (useKV) {
+		const kv = ctx.env.KV;
+		await kv.put(key, JSON.stringify(data), { expirationTtl: ttl });
+		return;
+	}
+
 	const db = ctx.get("db");
 
 	await db
