@@ -5,7 +5,6 @@
 
 import { BaseModel } from "./BaseModel.model";
 import { Station, StationModel, StationTrainPrediction } from "./Station.model";
-import { haversineDistance } from "@/utils/distance";
 
 /**
  * Type for train predictions with station information
@@ -48,10 +47,10 @@ export class TrainModel extends BaseModel {
 		});
 
 		// Get predictions for all nearby stations
-		let predictions =
-			await stationModel.listMultiplePredictionsByStationCodes(
-				Array.from(stationCodes)
-			);
+		const allPredictions = await stationModel.listAllPredictions();
+		let predictions = allPredictions.filter((prediction) =>
+			stationCodes.has(prediction.locationCode)
+		);
 
 		// Filter out "No Passenger" trains
 		predictions = predictions.filter(
@@ -66,7 +65,10 @@ export class TrainModel extends BaseModel {
 		};
 
 		// Sort predictions by arrival time
-		predictions.sort((a, b) => sortByMinutes(a.min, b.min));
+		predictions.sort(
+			(a: StationTrainPrediction, b: StationTrainPrediction) =>
+				sortByMinutes(a.min, b.min)
+		);
 
 		/**
 		 * Map to store unique train predictions
@@ -90,7 +92,7 @@ export class TrainModel extends BaseModel {
 			if (!stationEntrance) continue;
 
 			// Calculate distance from user to station
-			const distance = haversineDistance(
+			const distance = stationModel.calculateDistance(
 				latitude,
 				longitude,
 				stationEntrance.lat,

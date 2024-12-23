@@ -45,6 +45,12 @@ app.use(
 		url: "/doc",
 	})
 );
+app.use(
+	"/docs/wmata",
+	swaggerUI({
+		url: "https://raw.githubusercontent.com/APIs-guru/openapi-directory/refs/heads/main/APIs/wmata.com/rail-realtime/1.0/swagger.yaml",
+	})
+);
 
 export { TrainData };
 export default app;

@@ -25,6 +25,9 @@ export type Line = {
 	startStationCode: string;
 	endStationCode: string;
 
+	startStation?: Station;
+	endStation?: Station;
+
 	stations: Station[];
 
 	internalDestination1: string;
@@ -62,12 +65,15 @@ export class LineModel extends BaseModel {
 			internalDestination1: line.InternalDestination1,
 			internalDestination2: line.InternalDestination2,
 
-			stations: stations.filter(
-				(station) =>
-					station.lineCode1 === line.LineCode ||
-					station.lineCode2 === line.LineCode ||
-					station.lineCode3 === line.LineCode ||
-					station.lineCode4 === line.LineCode
+			startStation: stations.find(
+				(station) => station.code === line.StartStationCode
+			),
+			endStation: stations.find(
+				(station) => station.code === line.EndStationCode
+			),
+
+			stations: stations.filter((station) =>
+				station.lines?.includes(line.LineCode)
 			),
 		}));
 
@@ -76,10 +82,13 @@ export class LineModel extends BaseModel {
 
 		return response;
 	}
-	async getStationsFromLineCode(lineCode: string) {
-		const url = `/Rail.svc/json/jStations?LineCode=${lineCode}`;
-		const response = await wmataApi.get(url);
-		return response.data;
+	async getStationsFromLineCode(lineCode: string): Promise<Station[]> {
+		const stationModel = new StationModel(this.ctx);
+		const allStations = await stationModel.list();
+		const stations = allStations.filter((station) =>
+			station.lines?.includes(lineCode)
+		);
+		return stations;
 	}
 	async get(lineCode: string) {
 		const lines = await this.list();
@@ -87,6 +96,7 @@ export class LineModel extends BaseModel {
 		if (!line) {
 			throw new LineNotFoundError();
 		}
+		const stationModel = new StationModel(this.ctx);
 		const stations = line.stations;
 
 		const tracksModel = new TrackModel(this.ctx);
@@ -110,10 +120,14 @@ export class LineModel extends BaseModel {
 		 * Add the station codes to the array.
 		 */
 		for (const stationCode of stationCodesSorted) {
-			const station = stations.find(
+			let station = stations.find(
 				(station) => station.code === stationCode
 			);
 			if (station) {
+				const outages = await stationModel.listOutagesByStationCode(
+					stationCode
+				);
+				station.outages = outages;
 				stationsSorted.push(station);
 			}
 		}

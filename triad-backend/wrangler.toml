@@ -3,6 +3,9 @@ compatibility_flags = ["nodejs_compat_v2"]
 main = "src/index.ts"
 name = "triad-backend"
 
+[limits]
+cpu_ms = 4000
+
 # [vars]
 # MY_VAR = "my-variable"
 

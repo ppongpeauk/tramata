@@ -15,8 +15,15 @@ export const lines = sqliteTable("lines", {
 });
 
 export const stations = sqliteTable("stations", {
-	stationCode: text("station_code").primaryKey(),
-	displayName: text("display_name"),
+	code: text("code").primaryKey(),
+	name: text("name").notNull(),
+	lat: text("lat").notNull(),
+	lon: text("lon").notNull(),
+	street: text("street").notNull(),
+	city: text("city").notNull(),
+	state: text("state").notNull(),
+	zip: text("zip").notNull(),
+	lines: text("lines", { mode: "json" }).notNull().$type<string[]>(),
 });
 
 export const cachedObjects = sqliteTable("cached_objects", {

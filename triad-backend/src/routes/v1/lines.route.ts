@@ -21,7 +21,7 @@ const routes = {
 		tags: ["lines"],
 		request: {
 			params: z.object({
-				lineCode: z.string(),
+				lineCode: z.string().openapi({ example: "SV" }),
 			}),
 		},
 		responses: {
