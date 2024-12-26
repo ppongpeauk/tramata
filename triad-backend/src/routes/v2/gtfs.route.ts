@@ -56,8 +56,9 @@ const routes = {
 };
 
 app.openapi(routes.updateStatic, async (c) => {
-	const files = await downloadStaticGtfs({ ctx: c });
-	return c.json(files);
+	const gtfsStaticModel = new GTFSStatic(c);
+	await gtfsStaticModel.refreshStaticData();
+	return c.json({ message: "Static GTFS data refreshed." });
 });
 
 app.openapi(routes.tripUpdates, async (c) => {
@@ -94,13 +95,6 @@ app.openapi(routes.alerts, async (c) => {
 		console.error("Error fetching WMATA alerts:", error);
 		return c.json({ error: "Failed to fetch alerts" }, 500);
 	}
-});
-
-app.openapi(routes.stops, async (c) => {
-	const gtfsStaticModel = new GTFSStatic(c);
-	const stops = await gtfsStaticModel.getFromStaticData("stops");
-
-	return c.json(stops);
 });
 
 export default app;

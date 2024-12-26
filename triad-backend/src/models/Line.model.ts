@@ -8,6 +8,7 @@ import { BaseModel } from "./BaseModel.model";
 import { Station, StationModel } from "./Station.model";
 import { getCachedObject, setCachedObject } from "@/utils/cache";
 import { TrackModel } from "./Track.model";
+import { RouteModel, RouteNotFoundError } from "./Route.model";
 
 export type APILine = {
 	LineCode: string;
@@ -97,11 +98,24 @@ export class LineModel extends BaseModel {
 			throw new LineNotFoundError();
 		}
 		const stationModel = new StationModel(this.ctx);
+		const trackModel = new TrackModel(this.ctx);
+		const routeModel = new RouteModel(this.ctx);
+
+		const route = await routeModel.get(lineCode);
+		if (!route) throw new RouteNotFoundError();
+
 		const stations = line.stations;
 
-		const tracksModel = new TrackModel(this.ctx);
-		const tracks = await tracksModel.listFromLineCode(lineCode);
-		const tracksSorted = tracks.sort((a, b) => a.seqNum - b.seqNum);
+		const tracks = await trackModel.listFromLineCode(lineCode);
+		const tracksSorted = tracks.sort((a, b) => {
+			const aRoute = route.trackCircuits.find(
+				(circuit) => circuit.circuitId === a.circuitId
+			);
+			const bRoute = route.trackCircuits.find(
+				(circuit) => circuit.circuitId === b.circuitId
+			);
+			return (aRoute?.seqNum ?? 0) - (bRoute?.seqNum ?? 0);
+		});
 		let stationCodesSorted = new Set<string>();
 		let stationsSorted: Station[] = [];
 

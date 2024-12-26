@@ -6,12 +6,19 @@ name = "triad-backend"
 [limits]
 cpu_ms = 4000
 
+[triggers]
+crons = [
+  "*/1 * * * *", # Every minute
+  "0 4,16 * * *", # Every day at 4am and 4pm
+]
+
 # [vars]
 # MY_VAR = "my-variable"
 
 [[kv_namespaces]]
 binding = "KV"
 id = "3046170811b944e89778e8daa86e04db"
+preview_id = "c57c56f7ee3049a5a9b5246f20a95b27"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"
@@ -30,10 +37,3 @@ name = "TRAIN_DATA"
 [[migrations]]
 new_classes = ["TrainData"]
 tag = "v1"
-
-# [ai]
-# binding = "AI"
-
-# [observability]
-# enabled = true
-# head_sampling_rate = 1

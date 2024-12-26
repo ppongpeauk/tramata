@@ -33,6 +33,8 @@ import PrimaryTrainButton, {
 } from "@/components/primary-train-button";
 import { useQuery } from "@tanstack/react-query";
 import LineSymbol from "@/components/line-symbol";
+import { LinearGradient } from "expo-linear-gradient";
+import { useColorScheme } from "nativewind";
 
 export type TabDefinition = {
 	label: string;
@@ -44,6 +46,7 @@ export type TabDefinition = {
 export type TabName = TabDefinition["value"];
 
 export default function StationDetails() {
+	const { colorScheme } = useColorScheme();
 	const navigation = useNavigation();
 	const route = useRoute();
 	const { id, title, line } = route.params as {
@@ -123,7 +126,56 @@ export default function StationDetails() {
 	return (
 		<View className="flex-1 items-center justify-center">
 			<Tabs.Container
-				snapThreshold={0.5}
+				renderHeader={() => (
+					<View className="flex-row items-center justify-between bg-primary dark:bg-border border-y border-border gap-4 h-[128px] px-8">
+						<LinearGradient
+							colors={
+								colorScheme === "dark"
+									? ["rgba(0,0,0,0.5)", "transparent"]
+									: ["rgba(255,255,255,0.25)", "transparent"]
+							}
+							style={{
+								position: "absolute",
+								top: 0,
+								left: 0,
+								right: 0,
+								bottom: 0,
+							}}
+							start={{ x: 0, y: 1 }}
+							end={{ x: 1, y: 0 }}
+						/>
+						<View className="flex-col items-start justify-center">
+							<Text
+								className="text-text text-left"
+								weight="semiBold"
+								size="md"
+							>
+								{stationData?.name}
+							</Text>
+							<Text
+								className="text-text-secondary text-left"
+								weight="medium"
+								size="sm"
+							>
+								{stationData?.address.city},{" "}
+								{stationData?.address.state}
+							</Text>
+						</View>
+						<View className="flex-row items-center justify-center h-full gap-2">
+							{stationData?.lines.map((line) => (
+								<LineSymbol
+									code={line}
+									size={
+										stationData?.lines?.length > 2
+											? "md"
+											: "lg"
+									}
+									key={line}
+								/>
+							))}
+						</View>
+					</View>
+				)}
 				renderTabBar={(props) => (
 					<StationTabs definitions={TAB_DEFINITIONS} {...props} />
 				)}

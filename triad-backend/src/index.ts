@@ -1,6 +1,7 @@
 import { OpenAPIHono, z } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { GenericHono } from "./types";
+import { apiReference } from "@scalar/hono-api-reference";
 
 import v1 from "./routes/v1";
 import {
@@ -10,6 +11,8 @@ import {
 } from "./middleware";
 import { TrainData } from "@/durableObjects/websocket";
 import v2 from "./routes/v2";
+import { WorkerEntrypoint } from "cloudflare:workers";
+import { scheduled } from "./utils/cronjobs";
 
 const app = new OpenAPIHono<GenericHono>();
 
@@ -34,25 +37,23 @@ app.route("/v2", v2);
 /**
  * Documentation
  */
-app.doc("/doc", {
+app.doc("/openapi", {
 	openapi: "3.0.0",
 	info: {
 		version: "1.0.0",
 		title: "Hypermata Documentation",
 	},
 });
-app.use(
+app.get(
 	"/",
-	swaggerUI({
-		url: "/doc",
-	})
-);
-app.use(
-	"/docs/wmata",
-	swaggerUI({
-		url: "https://raw.githubusercontent.com/APIs-guru/openapi-directory/refs/heads/main/APIs/wmata.com/rail-realtime/1.0/swagger.yaml",
+	apiReference({
+		theme: "saturn",
+		spec: { url: "/openapi" },
 	})
 );
 
 export { TrainData };
-export default app;
+export default {
+	fetch: app.fetch,
+	scheduled,
+} as WorkerEntrypoint;

@@ -2,6 +2,12 @@ import { BaseModel } from "./BaseModel.model";
 import { wmataApi } from "@/utils/web";
 import { getCachedObject, setCachedObject } from "@/utils/cache";
 
+/**
+ * Static data for WMATA Stations.
+ */
+import stationsAll from "@/static/api_stations.json";
+import stationEntrances from "@/static/api_station_entrances.json";
+
 export type Station = {
 	code: string;
 	name: string;
@@ -237,10 +243,9 @@ export class StationModel extends BaseModel {
 			station.StationTogether2,
 		].filter((code): code is string => !!code);
 
-		// Get all stations from API
+		// Get all stations from static data
 		try {
-			const response = await wmataApi.get("/Rail.svc/json/jStations");
-			const allStations = response.data.Stations as APIStation[];
+			const allStations = stationsAll.Stations as APIStation[];
 
 			// Find connected stations
 			for (const code of platformCodes) {
@@ -263,16 +268,9 @@ export class StationModel extends BaseModel {
 	 * Get all station entrances
 	 */
 	async getAllStationEntrances(): Promise<StationEntrance[]> {
-		const cached = await getCachedObject(this.ctx, "station-entrances");
-		if (cached) {
-			return cached as StationEntrance[];
-		}
-
 		try {
-			const response = await wmataApi.get(
-				"/Rail.svc/json/jStationEntrances"
-			);
-			const entrances = response.data.Entrances as APIStationEntrance[];
+			const entrances =
+				stationEntrances.Entrances as APIStationEntrance[];
 
 			const transformed = entrances.map((entrance) => ({
 				id: entrance.ID,
@@ -284,12 +282,6 @@ export class StationModel extends BaseModel {
 				lon: entrance.Lon,
 			}));
 
-			await setCachedObject(
-				this.ctx,
-				"station-entrances",
-				transformed,
-				60 * 60
-			); // Cache for 1 hour
 			return transformed;
 		} catch (error) {
 			console.error("Error fetching station entrances:", error);
@@ -549,19 +541,8 @@ export class StationModel extends BaseModel {
 	 * List all stations
 	 */
 	async list(deduplicate: boolean = false): Promise<Station[]> {
-		// Try cache first
-		const cached = await getCachedObject(
-			this.ctx,
-			"stations:all" + (deduplicate ? ":dedup" : "")
-		);
-		if (cached) {
-			return cached as Station[];
-		}
-
-		// Fetch from API
 		try {
-			const response = await wmataApi.get("/Rail.svc/json/jStations");
-			const stations = response.data.Stations as APIStation[];
+			const stations = stationsAll.Stations as APIStation[];
 
 			// Transform and get connected stations for each station
 			let transformed = await Promise.all(
@@ -581,14 +562,6 @@ export class StationModel extends BaseModel {
 						: deduped.add(station.name)
 				);
 			}
-
-			// Cache the results
-			await setCachedObject(
-				this.ctx,
-				"stations:all" + (deduplicate ? ":dedup" : ""),
-				transformed,
-				60 * 60
-			); // Cache for 1 hour
 
 			return transformed;
 		} catch (error) {

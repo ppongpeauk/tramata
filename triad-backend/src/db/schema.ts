@@ -1,17 +1,12 @@
-import { sql } from "drizzle-orm";
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { relations, sql } from "drizzle-orm";
+import { sqliteTable, text, real, integer } from "drizzle-orm/sqlite-core";
 
-export const lines = sqliteTable("lines", {
-	lineCode: text("line_code").primaryKey(),
-	displayName: text("display_name"),
-
-	startStationCode: text("start_station_code"),
-	endStationCode: text("end_station_code"),
-
-	internalDestination1: text("internal_destination_1"),
-	internalDestination2: text("internal_destination_2"),
-
-	updateAfter: text("update_after").default(sql`(current_timestamp)`),
+export const routes = sqliteTable("routes", {
+	id: text("id").primaryKey(),
+	color: text("color"),
+	shortName: text("short_name"),
+	longName: text("long_name"),
+	type: integer("type"),
 });
 
 export const stations = sqliteTable("stations", {
@@ -25,6 +20,67 @@ export const stations = sqliteTable("stations", {
 	zip: text("zip").notNull(),
 	lines: text("lines", { mode: "json" }).notNull().$type<string[]>(),
 });
+
+export const stops = sqliteTable("stops", {
+	id: text("stop_id").primaryKey(),
+	name: text("stop_name"),
+	desc: text("stop_desc"),
+	lat: real("stop_lat"),
+	lon: real("stop_lon"),
+	zoneId: text("zone_id"),
+	locationType: integer("location_type"),
+	parentStation: text("parent_station"),
+	wheelchairBoarding: integer("wheelchair_boarding").default(1),
+	levelId: text("level_id"),
+});
+
+export const stopRelations = relations(stops, ({ many }) => ({
+	stopTimes: many(stopTimes),
+}));
+
+export const stopTimes = sqliteTable("stop_times", {
+	id: text("id").primaryKey(),
+
+	// Arrivals are the same as departures on WMATA's feed
+	arrivalTime: integer("arrival_time", { mode: "timestamp" }).notNull(),
+
+	tripId: text("trip_id").references(() => trips.id, { onDelete: "cascade" }),
+	stopId: text("stop_id")
+		.references(() => stops.id, { onDelete: "cascade" })
+		.notNull(),
+	stopSequence: integer("sequence").notNull(),
+	shapeDistTraveled: real("shape_dist_traveled").notNull(),
+});
+
+export const stopTimesRelations = relations(stopTimes, ({ one }) => ({
+	stop: one(stops, {
+		fields: [stopTimes.stopId],
+		references: [stops.id],
+	}),
+	trip: one(trips, {
+		fields: [stopTimes.tripId],
+		references: [trips.id],
+	}),
+}));
+
+export const trips = sqliteTable("trips", {
+	id: text("trip_id").primaryKey(),
+	routeId: text("route_id").references(() => routes.id),
+	serviceId: text("service_id"),
+	tripHeadsign: text("trip_headsign"),
+	directionId: text("direction_id"),
+	blockId: text("block_id"),
+	shapeId: text("shape_id"),
+	trainId: text("train_id"),
+});
+
+export const tripsRelations = relations(trips, ({ one, many }) => ({
+	stopTimes: many(stopTimes),
+	route: one(routes, {
+		fields: [trips.routeId],
+		references: [routes.id],
+	}),
+}));
 
 export const cachedObjects = sqliteTable("cached_objects", {
 	key: text("key").primaryKey(),

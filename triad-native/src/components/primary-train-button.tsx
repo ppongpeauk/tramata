@@ -13,7 +13,8 @@ import Animated, {
 	withTiming,
 	Easing,
 } from "react-native-reanimated";
-
+import * as Haptics from "expo-haptics";
+import { buttonHaptics } from "@/utils/haptics";
 export type StationTrainPredictionWithStation = StationTrainPrediction & {
 	station?: Station;
 };
@@ -60,17 +61,16 @@ export default function PrimaryTrainButton({
 
 	return (
 		<TouchableOpacity
-			className={`flex-row bg-primary dark:bg-background items-center justify-start gap-2 ${
-				size === "sm" ? "px-4 py-3" : "p-4"
-			}`}
+			className={`flex-row bg-primary dark:bg-background items-center justify-start gap-2 p-4`}
 			activeOpacity={0.5}
 			onPress={() => {
+				buttonHaptics();
 				navigation.navigate("TrainDetails", {
 					train,
 				} as never);
 			}}
 		>
-			<LineSymbol line={line} />
+			<LineSymbol code={lineAbbr} />
 			<CarCapacitySymbol capacity={train.car || "?"} />
 			<View className="flex-1 flex-col items-start justify-start">
 				<View

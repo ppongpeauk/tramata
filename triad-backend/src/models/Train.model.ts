@@ -122,4 +122,16 @@ export class TrainModel extends BaseModel {
 			.sort((a, b) => a[1] - b[1])
 			.map(([prediction, _]) => prediction);
 	}
+
+	async websocketSendTrainPredictions(
+		latitude: number,
+		longitude: number,
+		numStations: number
+	) {
+		const predictions = await this.getNearbyTrainPredictions(
+			latitude,
+			longitude,
+			numStations
+		);
+	}
 }

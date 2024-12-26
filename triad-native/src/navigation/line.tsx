@@ -45,7 +45,7 @@ export default function Line() {
 			headerTitle: () => {
 				return (
 					<View className="flex-row items-center gap-4">
-						<LineSymbol line={line as never} />
+						<LineSymbol code={line?.abbr as string} />
 						<View>
 							<Text className="text-text" size="md" weight="bold">
 								{line?.title}
@@ -88,7 +88,7 @@ export default function Line() {
 	}
 
 	return (
-		<ScrollView className="flex-1 py-8">
+		<ScrollView className="flex-1 bg-primary dark:bg-background py-8">
 			<LineView line={line as never} data={lineData as never} />
 		</ScrollView>
 	);

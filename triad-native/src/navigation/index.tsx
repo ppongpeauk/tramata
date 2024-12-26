@@ -58,7 +58,6 @@ const HomeTabs = createBottomTabNavigator({
 			options: {
 				title: "More",
 				headerTitle: "More",
-				headerShown: false,
 				tabBarIcon: ({ color, size }) => (
 					<Ionicons name="menu" size={size} color={color} />
 				),

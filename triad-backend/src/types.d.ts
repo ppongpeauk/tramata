@@ -12,6 +12,9 @@ export type GenericHono = {
 	Bindings: {
 		WMATA_API_PRIMARY_KEY: string;
 		WMATA_API_SECONDARY_KEY: string;
+		CLOUDFLARE_ACCOUNT_ID: string;
+		CLOUDFLARE_DB_ID: string;
+		CLOUDFLARE_D1_TOKEN: string;
 		DB: D1Database;
 		TRAIN_DATA: DurableObjectNamespace<TrainData>;
 		KV: KVNamespace;

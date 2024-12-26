@@ -3,8 +3,12 @@ import { BaseModel } from "./BaseModel.model";
 import { wmataApi } from "@/utils/web";
 import { RouteModel } from "./Route.model";
 
+/**
+ * Static data for WMATA Track Circuits.
+ */
+import trackCircuits from "@/static/api_track_circuits.json";
+
 export type APITrack = {
-	SeqNum: number;
 	CircuitId: number;
 	StationCode?: null;
 	Neighbors: {
@@ -14,7 +18,6 @@ export type APITrack = {
 };
 
 export type Track = {
-	seqNum: number;
 	circuitId: number;
 	stationCode?: null;
 	neighbors: {
@@ -25,22 +28,9 @@ export type Track = {
 
 export class TrackModel extends BaseModel {
 	async list(): Promise<Track[]> {
-		/**
-		 * Check if the data is cached.
-		 * If it is, return the cached data.
-		 * If it isn't, fetch the data from the API and cache it.
-		 */
-		const cached = await getCachedObject(this.ctx, "tracks");
-		if (cached) {
-			return cached as Track[];
-		}
-
-		const url = "/TrainPositions/TrackCircuits?contentType=json";
-		const apiResponse = await wmataApi.get(url);
-		const apiData = apiResponse.data as { TrackCircuits: APITrack[] };
+		const apiData = trackCircuits as { TrackCircuits: APITrack[] };
 
 		const response = apiData.TrackCircuits.map((track) => ({
-			seqNum: track.SeqNum,
 			circuitId: track.CircuitId,
 			stationCode: track.StationCode,
 			neighbors: track.Neighbors.map((neighbor) => ({
@@ -48,8 +38,6 @@ export class TrackModel extends BaseModel {
 				circuitIds: neighbor.CircuitIds,
 			})),
 		}));
-
-		await setCachedObject(this.ctx, "tracks", response, 60 * 60 * 1);
 
 		return response;
 	}

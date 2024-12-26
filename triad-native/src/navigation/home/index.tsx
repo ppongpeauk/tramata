@@ -148,7 +148,7 @@ function StationSelectScreen({ route, navigation }: any) {
 									return lineInfo ? (
 										<LineSymbol
 											key={line}
-											line={lineInfo}
+											code={lineInfo.abbr}
 										/>
 									) : null;
 								})}
@@ -172,7 +172,7 @@ function StepIcon({
 		case "RIDE":
 			const lineInfo = lines.find((l) => l.abbr === line);
 			if (!lineInfo) return null;
-			return <LineSymbol line={lineInfo} />;
+			return <LineSymbol code={lineInfo.abbr} />;
 		case "TRANSFER":
 			return (
 				<View className="w-6 h-6 rounded-full bg-yellow-500 items-center justify-center">

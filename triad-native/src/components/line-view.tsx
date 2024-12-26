@@ -3,7 +3,8 @@ import { lines } from "@/constants/lines";
 import { Text } from "@/components/ui/Text";
 import { Ionicons, MaterialCommunityIcons } from "./VectorIcons";
 import { useNavigation } from "@react-navigation/native";
-
+import * as Haptics from "expo-haptics";
+import { buttonHaptics } from "@/utils/haptics";
 export type LineData = {
 	lineCode: string;
 	displayName: string;
@@ -77,6 +78,7 @@ export default function LineView({
 				<TouchableOpacity
 					activeOpacity={0.5}
 					onPress={() => {
+						buttonHaptics();
 						navigation.navigate("StationDetails", {
 							id: station.code,
 							title: station.name,
@@ -85,7 +87,7 @@ export default function LineView({
 					}}
 				>
 					<View
-						className={`border-4 ${line.borderColor} bg-white dark:bg-background h-8 w-8 rounded-full`}
+						className={`border-4 ${line.borderColor} bg-white dark:bg-background h-10 w-10 rounded-full`}
 					/>
 				</TouchableOpacity>
 				<View className="absolute flex-col items-end ml-auto left-40 flex-shrink">

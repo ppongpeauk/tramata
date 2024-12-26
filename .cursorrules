@@ -1,0 +1,62 @@
+Folder structure:
+
+├── README.md
+├── bun.lockb
+├── drizzle
+│   ├── 0000_clear_caretaker.sql
+│   ├── 0001_complex_golden_guardian.sql
+│   └── meta
+│       ├── 0000_snapshot.json
+│       ├── 0001_snapshot.json
+│       └── _journal.json
+├── drizzle.config.ts
+├── gtfs-realtime.proto
+├── package.json
+├── src
+│   ├── db
+│   │   └── schema.ts
+│   ├── durableObjects
+│   │   └── websocket.ts
+│   ├── index.ts
+│   ├── middleware.ts
+│   ├── models
+│   │   ├── BaseModel.model.ts
+│   │   ├── Line.model.ts
+│   │   ├── Navigation.model.ts
+│   │   ├── Route.model.ts
+│   │   ├── Station.model.ts
+│   │   ├── Track.model.ts
+│   │   ├── Train.model.ts
+│   │   └── gtfs
+│   │       ├── GTFSLine.model.ts
+│   │       ├── GTFSRealtime.model.ts
+│   │       └── GTFSStatic.model.ts
+│   ├── proto
+│   │   └── src
+│   │       └── gtfs-realtime.ts
+│   ├── routes
+│   │   ├── v1
+│   │   │   ├── index.ts
+│   │   │   ├── lines.route.ts
+│   │   │   ├── stations.route.ts
+│   │   │   └── trains.route.ts
+│   │   └── v2
+│   │       ├── gtfs.route.ts
+│   │       └── index.ts
+│   ├── static
+│   │   ├── api_lines.json
+│   │   ├── api_standard_routes.json
+│   │   ├── api_station_entrances.json
+│   │   ├── api_station_parking.json
+│   │   ├── api_stations.json
+│   │   └── api_track_circuits.json
+│   ├── types.d.ts
+│   └── utils
+│       ├── cache.ts
+│       ├── cronjobs.ts
+│       ├── distance.ts
+│       ├── gtfs.ts
+│       └── web.ts
+├── tailwind.config.js
+├── tsconfig.json
+└── wrangler.toml

@@ -1,32 +1,52 @@
 import { DurableObject } from "cloudflare:workers";
 import { Env } from "hono/types";
 
+type Connection = {
+	lat: number;
+	lon: number;
+};
+
+type IdentifiableWebSocket = WebSocket & {
+	id: string;
+};
+
 export class TrainData extends DurableObject {
-	connections: Set<WebSocket>;
+	/**
+	 * Map of websocket connections to latitudes and longitudes for train predictions
+	 */
+	connections: Record<IdentifiableWebSocket["id"], Connection> = {};
 
 	constructor(state: DurableObjectState, env: Env) {
 		super(state, env);
-		this.connections = new Set<WebSocket>();
+
+		this.ctx.blockConcurrencyWhile(async () => {
+			this.connections =
+				(await this.ctx.storage.get("connections")) ?? {};
+		});
 	}
 
-	async addConnection(ws: WebSocket) {
-		console.log("Adding connection");
-		this.connections.add(ws);
+	async createIdentifiableWebSocket(
+		ws: WebSocket & { id?: string }
+	): Promise<IdentifiableWebSocket> {
+		const id = crypto.randomUUID();
+		ws.id = id;
+		return ws as IdentifiableWebSocket;
 	}
 
-	async removeConnection(ws: WebSocket) {
-		console.log("Removing connection");
-		this.connections.delete(ws);
+	async addConnection(ws: IdentifiableWebSocket, connection: Connection) {
+		this.connections[ws.id] = connection;
+		await this.ctx.storage.put("connections", this.connections);
+	}
+
+	async removeConnection(ws: IdentifiableWebSocket) {
+		delete this.connections[ws.id];
+		await this.ctx.storage.put("connections", this.connections);
 	}
 
 	async broadcast(data: string) {
-		console.log(
-			"Broadcasting data to",
-			this.connections.size,
-			"connections"
-		);
-		console.log("Data", data);
-		this.connections.forEach((ws) => {
+		const connections = await this.ctx.getWebSockets();
+		console.log("Broadcasting data to", connections.length, "connections");
+		connections.forEach((ws) => {
 			ws.send(data);
 		});
 	}
@@ -35,12 +55,14 @@ export class TrainData extends DurableObject {
 		const websocketPair = new WebSocketPair();
 		const [client, server] = Object.values(websocketPair);
 
-		console.log(
-			"Received a new websocket connect request, adding to connections."
-		);
+		console.log("Received a new websocket connect request.");
 
-		this.connections.add(client);
 		this.ctx.acceptWebSocket(server);
+
+		const identifiableClient = await this.createIdentifiableWebSocket(
+			client
+		);
+		this.addConnection(identifiableClient, { lat: 0, lon: 0 });
 
 		return new Response(null, {
 			status: 101,
@@ -49,8 +71,8 @@ export class TrainData extends DurableObject {
 	}
 
 	webSocketError(ws: WebSocket, error: unknown) {
-		console.error("webSocketError", error);
-		this.connections.delete(ws);
+		console.error("WebSocket error: ", error);
+		ws.close();
 	}
 
 	webSocketClose(
@@ -59,9 +81,7 @@ export class TrainData extends DurableObject {
 		_reason: string,
 		_wasClean: boolean
 	) {
-		console.log(
-			"Closing a websocket connection, removing from connections."
-		);
-		this.connections.delete(ws);
+		console.log("WebSocket closed.");
+		ws.close();
 	}
 }

@@ -47,8 +47,22 @@ export type GTFSFileType = {
 };
 
 export type GTFSData = {
-	[K in keyof GTFSFileType]: Record<string, GTFSFileType[K]>;
+	[K in keyof GTFSFileType]: GTFSFileType[K];
 };
+
+/**
+ * Convert HH:MM:SS to a timestamp in seconds.
+ * @param time - The time to convert.
+ * @returns The timestamp in seconds.
+ */
+export function convertTimeToTimestamp(time: string): Date {
+	const [hours, minutes, seconds] = time.split(":").map(Number);
+	const timestamp = new Date();
+	timestamp.setHours(hours);
+	timestamp.setMinutes(minutes);
+	timestamp.setSeconds(seconds);
+	return timestamp;
+}
 
 /**
  * Download the static GTFS data and return the parsed data as a dictionary of file names to data.
@@ -79,7 +93,8 @@ export async function downloadStaticGtfs({
 	for (const [filename, fileData] of Object.entries(unzipped)) {
 		const content = strFromU8(fileData);
 		const parsed = Papa.parse(content, { header: true });
-		files[filename] = parsed.data;
+		const filenameWithoutExtension = filename.split(".")[0];
+		files[filenameWithoutExtension] = parsed.data;
 	}
 
 	console.log("GTFS data parsed successfully");

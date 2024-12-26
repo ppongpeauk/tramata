@@ -4,16 +4,21 @@ import { lines } from "@/constants/lines";
 import { useNavigation } from "@react-navigation/native";
 
 export default function LineSymbol({
-	line,
+	code,
 	size = "md",
 	pressable = false,
 }: {
-	line: (typeof lines)[number];
+	code: string;
 	size?: "md" | "lg";
 	pressable?: boolean;
 }) {
 	const navigation = useNavigation();
 	const sizeClass = size === "md" ? "w-8 h-8" : "w-12 h-12";
+	const line = lines.find((line) => line.abbr === code);
+
+	if (!line) {
+		return null;
+	}
 
 	if (pressable) {
 		return (

@@ -210,7 +210,7 @@ function LinesSection({ station }: { station: Station }) {
 
 					return (
 						<LineSymbol
-							line={line}
+							code={lineCode}
 							size="lg"
 							pressable={true}
 							key={lineCode}

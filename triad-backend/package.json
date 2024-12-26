@@ -2,6 +2,7 @@
   "name": "triad-backend",
   "scripts": {
     "dev": "wrangler dev",
+    "dev:cron": "wrangler dev --test-scheduled",
     "deploy": "wrangler deploy --minify",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply triad-db-prod --local",
@@ -11,6 +12,7 @@
   "dependencies": {
     "@hono/swagger-ui": "^0.5.0",
     "@hono/zod-openapi": "^0.18.3",
+    "@scalar/hono-api-reference": "^0.5.165",
     "@types/papaparse": "^5.3.15",
     "axios": "^1.7.9",
     "drizzle-kit": "^0.30.1",

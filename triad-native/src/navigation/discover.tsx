@@ -13,6 +13,7 @@ import LineSymbol from "@/components/line-symbol";
 import * as Haptics from "expo-haptics";
 import { NearbyTrainButtons } from "@/components/modules/nearby-train-buttons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { buttonHaptics } from "@/utils/haptics";
 
 export const DiscoverStack = createNativeStackNavigator({
 	screens: {
@@ -89,15 +90,15 @@ function LineButton({ item }: { item: (typeof lines)[number] }) {
 	return (
 		<TouchableOpacity
 			activeOpacity={0.5}
-			className="flex flex-row items-center gap-3 bg-white dark:bg-neutral-950 py-3 px-4"
+			className="flex flex-row items-center gap-3 bg-white dark:bg-neutral-950 p-4"
 			onPress={() => {
-				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+				buttonHaptics();
 				navigation.navigate("Line", {
 					code: item.abbr,
 				} as never);
 			}}
 		>
-			<LineSymbol line={item} />
+			<LineSymbol code={item.abbr} />
 			<View className="flex-1 flex-col">
 				<Text className={"text-text"} weight="bold">
 					{item.title}
@@ -127,7 +128,7 @@ function SystemMapButton() {
 		<TouchableOpacity
 			className="flex flex-row items-center gap-3 bg-white dark:bg-neutral-950 py-4 px-4"
 			onPress={() => {
-				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+				buttonHaptics();
 				navigation.navigate("SystemMap" as never);
 			}}
 		>

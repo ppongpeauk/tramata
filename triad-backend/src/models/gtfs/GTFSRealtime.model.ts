@@ -2,9 +2,9 @@ import { BaseModel } from "../BaseModel.model";
 import { wmataApi } from "@/utils/web";
 import { FeedMessage, TripDescriptor } from "@/proto/src/gtfs-realtime";
 import {
-	StopTime,
-	Trip,
-	Alert,
+	StopTime as GTFSStopTime,
+	Trip as GTFSTrip,
+	Alert as GTFSAlert,
 	VehiclePosition as GTFSVehiclePosition,
 } from "gtfs-types";
 import { getCachedObject } from "@/utils/cache";
