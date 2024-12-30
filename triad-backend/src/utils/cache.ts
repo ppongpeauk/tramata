@@ -15,31 +15,16 @@ const TTL_MAX = 60 * 60 * 24 * 30; // 30 days
 export async function getCachedObject(
 	ctx: ContextHono,
 	key: string,
-	useKV: boolean = false
+	type: "text" | "json" | "arrayBuffer" | "stream" = "text"
 ) {
-	if (useKV) {
-		const kv = ctx.env.KV;
-		const cache = await kv.get(key);
-		if (!cache) {
-			return null;
-		}
-		return cache;
-	}
-	const db = ctx.get("db");
-	const cache = await db.query.cachedObjects.findFirst({
-		where: eq(schema.cachedObjects.key, key),
-	});
-	if (!cache) {
-		return null;
-	}
-	if (new Date(cache.updateAfter || "") < new Date()) {
-		await db
-			.delete(schema.cachedObjects)
-			.where(eq(schema.cachedObjects.key, key));
-		return null;
+	const kv = ctx.env.KV;
+	const cache = await kv.get(key, type as any);
+
+	if (cache) {
+		console.debug(`[Cache] Using cached ${key}.`);
 	}
 
-	return cache.data;
+	return !!cache ? JSON.parse(cache) : null;
 }
 
 /**
@@ -54,28 +39,12 @@ export async function setCachedObject(
 	key: string,
 	data: any,
 	ttl = TTL_DEFAULT,
-	useKV = false
+	expiration?: number
 ) {
-	if (useKV) {
-		const kv = ctx.env.KV;
-		await kv.put(key, JSON.stringify(data), { expirationTtl: ttl });
-		return;
-	}
-
-	const db = ctx.get("db");
-
-	await db
-		.insert(schema.cachedObjects)
-		.values({
-			key,
-			data,
-			updateAfter: new Date(Date.now() + ttl * 1000).toISOString(),
-		})
-		.onConflictDoUpdate({
-			target: [schema.cachedObjects.key],
-			set: {
-				data,
-				updateAfter: new Date(Date.now() + ttl * 1000).toISOString(),
-			},
-		});
+	const kv = ctx.env.KV;
+	await kv.put(key, JSON.stringify(data), {
+		expirationTtl: ttl,
+		expiration,
+	});
+	return;
 }

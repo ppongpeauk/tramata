@@ -1,13 +1,17 @@
+import { GTFSRealtimeModel } from "@/models/gtfs/GTFSRealtime.model";
 import { GenericHono } from "@/types";
+import { OpenAPIHono } from "@hono/zod-openapi";
 
 export async function scheduled(
 	event: ScheduledEvent,
-	env: GenericHono["Variables"],
+	env: GenericHono["Bindings"],
 	ctx: ExecutionContext
 ) {
+	const app = new OpenAPIHono();
+
 	switch (event.cron) {
 		case "*/1 * * * *":
-			console.log("Hello from cronjob!");
+			app.request("/v1/routines/broadcast/trainPositions", {}, env);
 			break;
 		case "0 4,16 * * *":
 			/**
@@ -15,7 +19,7 @@ export async function scheduled(
 			 *
 			 * - Fetch, parse, and store GTFS static data
 			 */
-			console.log("Hello from cronjob!");
+			app.request("/v1/routines/gtfs/static", {}, env);
 			break;
 		default:
 			console.log("Unknown cronjob");

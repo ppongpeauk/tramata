@@ -4,12 +4,16 @@ import { GenericHono } from "@/types";
 import trains from "./trains.route";
 import lines from "./lines.route";
 import stations from "./stations.route";
+import routines from "./routines.route";
+import trips from "./trips.route";
 
 const app = new OpenAPIHono<GenericHono>();
 
 app.route("/trains", trains);
 app.route("/lines", lines);
 app.route("/stations", stations);
+app.route("/routines", routines);
+app.route("/trips", trips);
 
 app.openapi(
 	createRoute({
@@ -66,7 +70,7 @@ app.openapi(
 	async (c) => {
 		const { message } = await c.req.json();
 		const trainDataStub = c.get("trainDataStub");
-		await trainDataStub.broadcast(message);
+		await trainDataStub.broadcast("test", message);
 		return c.text(null as any, 204);
 	}
 );

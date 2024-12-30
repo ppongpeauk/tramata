@@ -1,13 +1,19 @@
 import { BaseModel } from "../BaseModel.model";
 import { wmataApi } from "@/utils/web";
-import { FeedMessage, TripDescriptor } from "@/proto/src/gtfs-realtime";
+import {
+	FeedEntity,
+	FeedMessage,
+	TripDescriptor,
+} from "@/proto/src/gtfs-realtime";
 import {
 	StopTime as GTFSStopTime,
 	Trip as GTFSTrip,
 	Alert as GTFSAlert,
 	VehiclePosition as GTFSVehiclePosition,
+	Entity,
 } from "gtfs-types";
-import { getCachedObject } from "@/utils/cache";
+import { getCachedObject, setCachedObject } from "@/utils/cache";
+import { GTFSStaticModel } from "./GTFSStatic.model";
 
 export type TripUpdate = {
 	tripId: string;
@@ -22,17 +28,35 @@ export type TripUpdate = {
 
 export type VehiclePosition = {
 	vehicleId: string;
-	tripId: string;
-	stopId: string;
+	trip: {
+		tripId: string;
+		routeId: string;
+		directionId: number;
+		startTime: string;
+		startDate: string;
+		scheduleRelationship: number;
+	};
+	vehicle: {
+		id: string;
+		label: string;
+		licensePlate: string;
+		wheelchairAccessible: number;
+	};
 	position: {
 		latitude: number;
 		longitude: number;
 		bearing?: number;
+		odometer?: number;
 		speed?: number;
 	};
+	currentStopSequence: number;
+	stopId: string;
+	currentStatus?: number;
 	timestamp: number;
-	currentStatus?: string;
-	occupancyStatus?: string;
+	congestionLevel?: number;
+	occupancyStatus?: number;
+	occupancyPercentage?: number;
+	multiCarriageDetails: any[]; // Adjust type as necessary
 };
 
 export type ServiceAlert = {
@@ -52,7 +76,7 @@ export type ServiceAlert = {
 	}[];
 };
 
-export class GTFSRealtime extends BaseModel {
+export class GTFSRealtimeModel extends BaseModel {
 	/**
 	 * Fetches and decodes a GTFS Realtime feed from WMATA
 	 */
@@ -69,29 +93,92 @@ export class GTFSRealtime extends BaseModel {
 		}
 	}
 
+	async refreshTripUpdates(): Promise<Entity[]> {
+		const feed = await this.fetchFeed("/gtfs/rail-gtfsrt-tripupdates.pb");
+		const tripUpdates = feed.entity.map((entity) => entity.tripUpdate);
+		await setCachedObject(
+			this.ctx,
+			"tripUpdates",
+			JSON.stringify(tripUpdates),
+			60
+		);
+
+		// /**
+		//  * Merge the trip updates with the static data.
+		//  */
+		// const gtfsStaticModel = new GTFSStaticModel(this.ctx);
+		// const staticTrips = await gtfsStaticModel.getTrips();
+
+		// const mergedTripUpdates: TripUpdate[] = [];
+		// for (const tripUpdate of tripUpdates) {
+		// 	const staticTrip = staticTrips.find(
+		// 		(trip) => trip.trip_id === tripUpdate?.trip?.tripId
+		// 	);
+		// 	if (!staticTrip) continue;
+
+		// 	mergedTripUpdates.push({
+		// 		...tripUpdate,
+		// 		...staticTrip,
+		// 	});
+		// }
+
+		// return mergedTripUpdates as unknown as Entity[];
+
+		return tripUpdates as unknown as Entity[];
+	}
+
+	async refreshVehiclePositions(): Promise<Entity[]> {
+		const feed = await this.fetchFeed(
+			"/gtfs/rail-gtfsrt-vehiclepositions.pb"
+		);
+		const vehiclePositions = feed.entity.map((entity) => entity.vehicle);
+
+		await setCachedObject(
+			this.ctx,
+			"vehiclePositions",
+			JSON.stringify(vehiclePositions),
+			60
+		);
+		return vehiclePositions as unknown as Entity[];
+	}
+
+	async refreshAlerts(): Promise<Entity[]> {
+		const feed = await this.fetchFeed("/gtfs/rail-gtfsrt-alerts.pb");
+		const alerts = feed.entity.map((entity) => entity.alert);
+		await setCachedObject(this.ctx, "alerts", JSON.stringify(alerts), 60);
+		return alerts as unknown as Entity[];
+	}
+
+	async refreshRealtimeData(): Promise<void> {
+		await this.refreshTripUpdates();
+		await this.refreshVehiclePositions();
+		await this.refreshAlerts();
+	}
+
+	async clearCache(): Promise<void> {
+		await this.ctx.env.KV.delete("tripUpdates");
+		await this.ctx.env.KV.delete("vehiclePositions");
+		await this.ctx.env.KV.delete("alerts");
+	}
+
 	/**
 	 * Get trip updates for all active trips
 	 */
-	async getTripUpdates(): Promise<TripUpdate[]> {
-		const feed = await this.fetchFeed("/gtfs/rail-gtfsrt-tripupdates.pb");
+	async getTripUpdates(): Promise<Entity[]> {
+		const cached = (await getCachedObject(
+			this.ctx,
+			"tripUpdates",
+			"json"
+		)) as Entity[] | null;
 
-		return feed.entity
-			.filter((entity) => entity.tripUpdate)
-			.map((entity) => ({
-				tripId: entity.tripUpdate?.trip?.tripId || "",
-				routeId: entity.tripUpdate?.trip?.routeId || "",
-				stopTimeUpdates:
-					entity.tripUpdate?.stopTimeUpdate.map((update) => ({
-						stopId: update.stopId || "",
-						arrival: update.arrival
-							? Number(update.arrival.time)
-							: null,
-						departure: update.departure
-							? Number(update.departure.time)
-							: null,
-					})) || [],
-				trip: entity.tripUpdate?.trip,
-			}));
+		if (cached) {
+			console.debug(`[GTFSRealtime] Using cached trip updates.`);
+			return cached;
+		}
+
+		console.debug(`[GTFSRealtime] Fetching trip updates from API.`);
+		const feed = await this.refreshTripUpdates();
+		return feed as unknown as Entity[];
 	}
 
 	/**
@@ -103,63 +190,42 @@ export class GTFSRealtime extends BaseModel {
 		 * If it is, return the cached data.
 		 * If it isn't, fetch the data from the API and cache it.
 		 */
-		const cached = await getCachedObject(this.ctx, "vehiclePositions");
+		const cached = (await getCachedObject(
+			this.ctx,
+			"vehiclePositions",
+			"json"
+		)) as VehiclePosition[] | null;
+
 		if (cached) {
-			return cached as VehiclePosition[];
+			console.debug(`[GTFSRealtime] Using cached vehicle positions.`);
+			return cached;
 		}
 
-		const feed = await this.fetchFeed(
-			"/gtfs/rail-gtfsrt-vehiclepositions.pb"
-		);
-
-		return feed.entity
-			.filter((entity) => entity.vehicle)
-			.map((entity) => ({
-				vehicleId: entity.vehicle?.vehicle?.id || "",
-				tripId: entity.vehicle?.trip?.tripId || "",
-				stopId: entity.vehicle?.stopId || "",
-				position: {
-					latitude: entity.vehicle?.position?.latitude || 0,
-					longitude: entity.vehicle?.position?.longitude || 0,
-					bearing: entity.vehicle?.position?.bearing,
-					speed: entity.vehicle?.position?.speed,
-				},
-				timestamp: entity.vehicle?.timestamp
-					? Number(entity.vehicle.timestamp)
-					: 0,
-				currentStatus: entity.vehicle?.currentStatus?.toString(),
-				occupancyStatus: entity.vehicle?.occupancyStatus?.toString(),
-			}));
+		console.debug(`[GTFSRealtime] Fetching vehicle positions from API.`);
+		const feed = await this.refreshVehiclePositions();
+		return feed as unknown as VehiclePosition[];
 	}
 
 	/**
 	 * Get all active service alerts
 	 */
-	async getAlerts(): Promise<ServiceAlert[]> {
-		const feed = await this.fetchFeed("/gtfs/rail-gtfsrt-alerts.pb");
+	async getAlerts(): Promise<Entity[]> {
+		/**
+		 * Check if the data is cached.
+		 * If it is, return the cached data.
+		 * If it isn't, fetch the data from the API and cache it.
+		 */
+		const cached = (await getCachedObject(this.ctx, "alerts", "json")) as
+			| Entity[]
+			| null;
 
-		return feed.entity
-			.filter((entity) => entity.alert)
-			.map((entity) => {
-				const alert = entity.alert!;
-				return {
-					id: entity.id || "",
-					effect: alert.effect?.toString() || "",
-					url: alert.url?.translation?.[0]?.text,
-					headerText: alert.headerText?.translation?.[0]?.text || "",
-					descriptionText:
-						alert.descriptionText?.translation?.[0]?.text || "",
-					activePeriod: alert.activePeriod.map((period) => ({
-						start: Number(period.start || 0),
-						end: period.end ? Number(period.end) : undefined,
-					})),
+		if (cached) {
+			console.debug(`[GTFSRealtime] Using cached alerts.`);
+			return cached;
+		}
 
-					informedEntity: alert.informedEntity.map((entity) => ({
-						routeId: entity.routeId,
-						stopId: entity.stopId,
-						trip: entity.trip,
-					})),
-				};
-			});
+		console.debug(`[GTFSRealtime] Fetching alerts from API.`);
+		const feed = await this.refreshAlerts();
+		return feed as unknown as Entity[];
 	}
 }

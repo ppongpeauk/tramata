@@ -1,8 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { StationModel } from "@/models/Station.model";
-import { NavigationModel, NavigationRoute } from "@/models/Navigation.model";
 import { GenericHono } from "@/types";
-import { stations } from "@/db/schema";
 
 const app = new OpenAPIHono<GenericHono>();
 
@@ -76,36 +74,6 @@ const routes = {
 			},
 		},
 	}),
-	getNavigation: createRoute({
-		tags: ["stations"],
-		summary: "Get navigation directions between two stations",
-		method: "get",
-		path: "/navigation/{fromCode}/{toCode}",
-		request: {
-			params: z.object({
-				fromCode: z.string(),
-				toCode: z.string(),
-			}),
-		},
-		responses: {
-			200: {
-				description: "Returns navigation directions between stations.",
-				content: {
-					"application/json": {
-						schema: NavigationResponseSchema,
-					},
-				},
-			},
-			400: {
-				description: "Invalid station codes or no path found.",
-				content: {
-					"application/json": {
-						schema: ErrorResponseSchema,
-					},
-				},
-			},
-		},
-	}),
 };
 
 /**
@@ -136,24 +104,6 @@ app.openapi(routes.get, async (c) => {
 		return c.json({ error: "Station not found." }, 404);
 	}
 	return c.json(station);
-});
-
-type NavigationResponse = z.infer<typeof NavigationResponseSchema>;
-type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
-
-app.openapi(routes.getNavigation, async (c) => {
-	const { fromCode, toCode } = c.req.valid("param");
-	const navigationModel = new NavigationModel(c);
-
-	try {
-		const route = await navigationModel.calculateRoute(fromCode, toCode);
-		return c.json(route satisfies NavigationResponse, 200);
-	} catch (error: any) {
-		const errorResponse: ErrorResponse = {
-			error: error.message || "Navigation calculation failed",
-		};
-		return c.json(errorResponse, 400);
-	}
 });
 
 export default app;

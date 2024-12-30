@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import CarCapacitySymbol from "@/components/car-capacity-symbol";
 import LineSymbol from "@/components/line-symbol";
 import { lines } from "@/constants/lines";
-import { Station, StationTrainPrediction } from "@/types/station";
+import { Station, StationArrival } from "@/types/station";
 import { useNavigation } from "@react-navigation/native";
 import Animated, {
 	useAnimatedStyle,
@@ -15,7 +15,8 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { buttonHaptics } from "@/utils/haptics";
-export type StationTrainPredictionWithStation = StationTrainPrediction & {
+
+export type StationArrivalWithStation = StationArrival & {
 	station?: Station;
 };
 
@@ -25,7 +26,7 @@ export default function PrimaryTrainButton({
 	size = "md",
 }: {
 	lineAbbr: string;
-	train: StationTrainPredictionWithStation;
+	train: StationArrivalWithStation;
 	size?: "sm" | "md";
 }) {
 	const navigation = useNavigation();
@@ -101,7 +102,7 @@ export default function PrimaryTrainButton({
 							weight="semiBold"
 							size={size === "sm" ? "sm" : "md"}
 						>
-							{train.destination}
+							{train.destinationName}
 						</Text>
 					)}
 				</View>

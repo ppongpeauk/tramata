@@ -1,3 +1,8 @@
+/**
+ * @author Pete Pongpeauk <ppongpeauk@gmail.com>
+ */
+
+import { Station } from "@/types/station";
 import * as FileSystem from "expo-file-system";
 
 const mapUrl =
@@ -47,4 +52,45 @@ export async function fetchAndSaveMap() {
 		}
 		return null;
 	}
+}
+
+/**
+ * Get the distance between two points on the map in meters.
+ * @param lat1 - The latitude of the first point.
+ * @param lon1 - The longitude of the first point.
+ * @param lat2 - The latitude of the second point.
+ * @param lon2 - The longitude of the second point.
+ * @returns The distance between the two points in meters.
+ */
+export function getDistance(
+	lat1: number,
+	lon1: number,
+	lat2: number,
+	lon2: number
+) {
+	const R = 6371000; // Earth's radius in meters
+	const dLat = ((lat2 - lat1) * Math.PI) / 180;
+	const dLon = ((lon2 - lon1) * Math.PI) / 180;
+	const a =
+		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos((lat1 * Math.PI) / 180) *
+			Math.cos((lat2 * Math.PI) / 180) *
+			Math.sin(dLon / 2) *
+			Math.sin(dLon / 2);
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	const d = R * c;
+	return d;
+}
+
+/**
+ * Get the distance between two stations in meters.
+ * @param station1 - The first station.
+ * @param station2 - The second station.
+ * @returns The distance between the two stations in meters.
+ */
+export function getDistanceBetweenStations(
+	station1: Station,
+	station2: Station
+) {
+	return getDistance(station1.lat, station1.lon, station2.lat, station2.lon);
 }

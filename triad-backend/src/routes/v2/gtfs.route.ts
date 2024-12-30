@@ -3,8 +3,9 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { FeedMessage, VehiclePosition, Alert } from "@/proto/src/gtfs-realtime";
 import { wmataApi } from "@/utils/web";
 import { downloadStaticGtfs } from "@/utils/gtfs";
-import { GTFSRealtime } from "@/models/gtfs/GTFSRealtime.model";
-import { GTFSStatic } from "@/models/gtfs/GTFSStatic.model";
+import { GTFSRealtimeModel } from "@/models/gtfs/GTFSRealtime.model";
+import { GTFSStaticModel } from "@/models/gtfs/GTFSStatic.model";
+import { TrainModel } from "@/models/Train.model";
 const app = new OpenAPIHono<GenericHono>();
 
 const routes = {
@@ -53,17 +54,35 @@ const routes = {
 			},
 		},
 	}),
+	clearCache: createRoute({
+		method: "get",
+		path: "/clear-cache",
+		responses: {
+			200: {
+				description: "Success",
+			},
+		},
+	}),
+	test: createRoute({
+		method: "get",
+		path: "/test",
+		responses: {
+			200: {
+				description: "Success",
+			},
+		},
+	}),
 };
 
 app.openapi(routes.updateStatic, async (c) => {
-	const gtfsStaticModel = new GTFSStatic(c);
+	const gtfsStaticModel = new GTFSStaticModel(c);
 	await gtfsStaticModel.refreshStaticData();
 	return c.json({ message: "Static GTFS data refreshed." });
 });
 
 app.openapi(routes.tripUpdates, async (c) => {
 	try {
-		const gtfsRealtimeModel = new GTFSRealtime(c);
+		const gtfsRealtimeModel = new GTFSRealtimeModel(c);
 		const tripUpdates = await gtfsRealtimeModel.getTripUpdates();
 
 		return c.json(tripUpdates);
@@ -75,7 +94,7 @@ app.openapi(routes.tripUpdates, async (c) => {
 
 app.openapi(routes.vehiclePositions, async (c) => {
 	try {
-		const gtfsRealtimeModel = new GTFSRealtime(c);
+		const gtfsRealtimeModel = new GTFSRealtimeModel(c);
 		const vehiclePositions = await gtfsRealtimeModel.getVehiclePositions();
 
 		return c.json(vehiclePositions);
@@ -87,7 +106,7 @@ app.openapi(routes.vehiclePositions, async (c) => {
 
 app.openapi(routes.alerts, async (c) => {
 	try {
-		const gtfsRealtimeModel = new GTFSRealtime(c);
+		const gtfsRealtimeModel = new GTFSRealtimeModel(c);
 		const alerts = await gtfsRealtimeModel.getAlerts();
 
 		return c.json(alerts);
@@ -95,6 +114,21 @@ app.openapi(routes.alerts, async (c) => {
 		console.error("Error fetching WMATA alerts:", error);
 		return c.json({ error: "Failed to fetch alerts" }, 500);
 	}
+});
+
+app.openapi(routes.clearCache, async (c) => {
+	const gtfsRealtimeModel = new GTFSRealtimeModel(c);
+	const gtfsStaticModel = new GTFSStaticModel(c);
+	await gtfsRealtimeModel.clearCache();
+	// await gtfsStaticModel.clearCache();
+
+	return c.json({ message: "Cache cleared." });
+});
+
+app.openapi(routes.test, async (c) => {
+	const trainModel = new TrainModel(c);
+	const trains = await trainModel.getTrains();
+	return c.json(trains);
 });
 
 export default app;

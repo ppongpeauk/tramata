@@ -9,6 +9,7 @@ import { Station, StationModel } from "./Station.model";
 import { getCachedObject, setCachedObject } from "@/utils/cache";
 import { TrackModel } from "./Track.model";
 import { RouteModel, RouteNotFoundError } from "./Route.model";
+import linesData from "@/static/api_lines.json";
 
 export type APILine = {
 	LineCode: string;
@@ -39,19 +40,7 @@ export class LineNotFoundError extends Error {}
 
 export class LineModel extends BaseModel {
 	async list(): Promise<Line[]> {
-		/**
-		 * Check if the data is cached.
-		 * If it is, return the cached data.
-		 * If it isn't, fetch the data from the API and cache it.
-		 */
-		const cached = await getCachedObject(this.ctx, "lines");
-		if (cached) {
-			return cached as Line[];
-		}
-
-		const url = "/Rail.svc/json/jLines";
-		const apiResponse = await wmataApi.get(url);
-		const apiData = apiResponse.data as { Lines: APILine[] };
+		const apiData = linesData as { Lines: APILine[] };
 
 		const stationModel = new StationModel(this.ctx);
 		const stations = await stationModel.list();
@@ -78,9 +67,6 @@ export class LineModel extends BaseModel {
 			),
 		}));
 
-		// Cache for 1 hour
-		await setCachedObject(this.ctx, "lines", response, 60 * 60 * 1);
-
 		return response;
 	}
 	async getStationsFromLineCode(lineCode: string): Promise<Station[]> {
@@ -91,7 +77,7 @@ export class LineModel extends BaseModel {
 		);
 		return stations;
 	}
-	async get(lineCode: string) {
+	async get(lineCode: string): Promise<Line | null> {
 		const lines = await this.list();
 		let line = lines.find((line) => line.lineCode === lineCode);
 		if (!line) {
@@ -149,7 +135,6 @@ export class LineModel extends BaseModel {
 		return {
 			...line,
 			stations: stationsSorted,
-			tracks: tracksSorted,
 		};
 	}
 }

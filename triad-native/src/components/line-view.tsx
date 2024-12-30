@@ -3,8 +3,9 @@ import { lines } from "@/constants/lines";
 import { Text } from "@/components/ui/Text";
 import { Ionicons, MaterialCommunityIcons } from "./VectorIcons";
 import { useNavigation } from "@react-navigation/native";
-import * as Haptics from "expo-haptics";
 import { buttonHaptics } from "@/utils/haptics";
+import { getDistanceBetweenStations } from "@/utils/map";
+
 export type LineData = {
 	lineCode: string;
 	displayName: string;

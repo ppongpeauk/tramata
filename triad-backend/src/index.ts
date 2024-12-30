@@ -1,5 +1,5 @@
 import { OpenAPIHono, z } from "@hono/zod-openapi";
-import { swaggerUI } from "@hono/swagger-ui";
+import { SwaggerUI, swaggerUI } from "@hono/swagger-ui";
 import { GenericHono } from "./types";
 import { apiReference } from "@scalar/hono-api-reference";
 
@@ -46,9 +46,8 @@ app.doc("/openapi", {
 });
 app.get(
 	"/",
-	apiReference({
-		theme: "saturn",
-		spec: { url: "/openapi" },
+	swaggerUI({
+		url: "/openapi",
 	})
 );
 

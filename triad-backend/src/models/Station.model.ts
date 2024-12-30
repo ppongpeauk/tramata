@@ -1,5 +1,5 @@
 import { BaseModel } from "./BaseModel.model";
-import { wmataApi } from "@/utils/web";
+import { pulseApi, wmataApi } from "@/utils/web";
 import { getCachedObject, setCachedObject } from "@/utils/cache";
 
 /**
@@ -26,7 +26,7 @@ export type Station = {
 		zip: string;
 	};
 	lines: string[];
-	predictions?: StationTrainPrediction[];
+	predictions?: StationArrival[];
 	outages?: StationOutage[];
 	parking?: StationParking;
 };
@@ -47,16 +47,24 @@ export type StationParking = {
 	};
 };
 
-export type StationTrainPrediction = {
-	car: string;
-	destination: string;
+export type StationArrival = {
+	tripId: string;
+
 	destinationCode: string;
 	destinationName: string;
-	group: string;
+	headsign: string;
+
+	car: string | number;
 	line: string;
-	locationCode: string;
-	locationName: string;
-	min: string;
+
+	startTime: string;
+	min: string | number;
+
+	latitude: number;
+	longitude: number;
+	bearing: number;
+	directionNum: number;
+	holdingOrSlow: boolean;
 };
 
 export type StationOutage = {
@@ -156,6 +164,25 @@ type APIStationEntrance = {
 	Description: string;
 	Lat: number;
 	Lon: number;
+};
+
+type PulseAPIArrival = {
+	TripId: string;
+	DirectionNum: number;
+	DestinationName: string;
+	LocationCode: string;
+	NextLocationCode: string;
+	CarCount: string;
+	TrainId: string;
+	LineCode: string;
+	IsCurrentlyHoldingOrSlow: boolean;
+	Min: number | string;
+	ArrivalTime: number;
+	StartTime: string;
+	TripHeadsign: string;
+	vehicleLat: number;
+	vehicleLon: number;
+	Bearing: number;
 };
 
 export class StationModel extends BaseModel {
@@ -338,10 +365,10 @@ export class StationModel extends BaseModel {
 	/**
 	 * Get all predictions for all stations
 	 */
-	async listAllPredictions(): Promise<StationTrainPrediction[]> {
+	async listAllPredictions(): Promise<StationArrival[]> {
 		const cached = await getCachedObject(this.ctx, "predictions:all");
 		if (cached) {
-			return cached as StationTrainPrediction[];
+			return cached as StationArrival[];
 		}
 
 		try {
@@ -350,19 +377,20 @@ export class StationModel extends BaseModel {
 			);
 			const predictions = response.data.Trains as APIStationPrediction[];
 
-			const transformed = predictions.map((prediction) => ({
-				car: prediction.Car,
-				destination: prediction.Destination,
-				destinationCode: prediction.DestinationCode,
-				destinationName: prediction.DestinationName,
-				group: prediction.Group,
-				line: prediction.Line,
-				locationCode: prediction.LocationCode,
-				locationName: prediction.LocationName,
-				min: prediction.Min,
-			}));
+			const transformed = predictions.map(
+				(prediction) =>
+					({
+						tripId: "",
+						destinationCode: prediction.DestinationCode,
+						destinationName: prediction.DestinationName,
+						headsign: prediction.DestinationName,
+						car: prediction.Car,
+						line: prediction.Line,
+						min: prediction.Min,
+					} as StationArrival)
+			);
 
-			await setCachedObject(this.ctx, "predictions:all", transformed, 30); // Cache for 30 seconds
+			await setCachedObject(this.ctx, "predictions:all", transformed, 60); // Cache for 1 minute
 			return transformed;
 		} catch (error) {
 			console.error("Error fetching train predictions:", error);
@@ -375,7 +403,7 @@ export class StationModel extends BaseModel {
 	 */
 	async listPredictionsByStationCode(
 		code: string
-	): Promise<StationTrainPrediction[]> {
+	): Promise<StationArrival[]> {
 		const relatedStationCodes = new Set<string>();
 		relatedStationCodes.add(code);
 
@@ -389,10 +417,73 @@ export class StationModel extends BaseModel {
 			}
 		}
 
-		const allPredictions = await this.listAllPredictions();
-		return allPredictions.filter((prediction) =>
-			relatedStationCodes.has(prediction.locationCode)
+		// const allPredictions = await this.listAllPredictions();
+		// return allPredictions.filter((prediction) =>
+		// 	relatedStationCodes.has(prediction.locationCode)
+		// );
+
+		let arrivals: PulseAPIArrival[] = [];
+
+		for (const code of relatedStationCodes) {
+			console.log(`Fetching arrivals for station ${code}`);
+			const pulseAPIArrivals = await pulseApi.get(
+				`/metro-train-arrivals?station=${code}`
+			);
+			arrivals.push(...pulseAPIArrivals.data);
+		}
+
+		let transformed = arrivals.map((arrival) => ({
+			tripId: arrival.TripId,
+			car: arrival.CarCount,
+			destinationCode: arrival.LocationCode,
+			destinationName: arrival.DestinationName,
+			headsign: arrival.DestinationName, // same as destinationName
+			line: arrival.LineCode,
+			holdingOrSlow: arrival.IsCurrentlyHoldingOrSlow,
+			latitude: arrival.vehicleLat,
+			longitude: arrival.vehicleLon,
+			bearing: arrival.Bearing,
+			directionNum: arrival.DirectionNum,
+			min: arrival.Min,
+			startTime: arrival.StartTime,
+		}));
+
+		/**
+		 * Omit all arrivals that have a 24hr format set as min,
+		 * since they never have an assigned trip ID.
+		 */
+		transformed = transformed.filter(
+			(arrival) =>
+				typeof arrival.min === "number" ||
+				arrival.min === "ARR" ||
+				arrival.min === "BRD"
 		);
+
+		/**
+		 * Sort arrivals by min.
+		 * ARR/BRD first, then min ascending
+		 * There are edge cases where min is 24hr format (24:00)
+		 */
+		transformed.sort((a, b) => {
+			if (a.min === "ARR" || a.min === "BRD") return -1;
+			if (b.min === "ARR" || b.min === "BRD") return 1;
+			if (typeof a.min === "number" && typeof b.min === "number") {
+				return a.min - b.min;
+			} else {
+				/**
+				 * Convert 24hr format to minutes
+				 */
+				const aMin =
+					parseInt(a.min.toString().split(":")[0]) * 60 +
+					parseInt(a.min.toString().split(":")[1]);
+				const bMin =
+					parseInt(b.min.toString().split(":")[0]) * 60 +
+					parseInt(b.min.toString().split(":")[1]);
+				return aMin - bMin;
+			}
+		});
+
+		return transformed;
 	}
 
 	/**

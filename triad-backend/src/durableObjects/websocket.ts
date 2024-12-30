@@ -43,11 +43,11 @@ export class TrainData extends DurableObject {
 		await this.ctx.storage.put("connections", this.connections);
 	}
 
-	async broadcast(data: string) {
+	async broadcast(type: string, data: any) {
 		const connections = await this.ctx.getWebSockets();
 		console.log("Broadcasting data to", connections.length, "connections");
 		connections.forEach((ws) => {
-			ws.send(data);
+			ws.send(JSON.stringify({ type, data }));
 		});
 	}
 

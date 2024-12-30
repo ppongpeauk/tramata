@@ -30,21 +30,29 @@ export type Station = {
 		zip: string;
 	};
 	outages?: StationOutage[];
-	predictions?: StationTrainPrediction[];
+	arrivals?: StationArrival[];
 	lines: string[];
 	parking?: StationParking;
 };
 
-export type StationTrainPrediction = {
-	car: string;
-	destination: string;
+export type StationArrival = {
+	tripId: string;
+
 	destinationCode: string;
 	destinationName: string;
-	group: string;
+	headsign: string;
+
+	car: string | number;
 	line: string;
-	locationCode: string;
-	locationName: string;
-	min: string;
+
+	startTime: string;
+	min: string | number;
+
+	latitude: number;
+	longitude: number;
+	bearing: number;
+	directionNum: number;
+	holdingOrSlow: boolean;
 };
 
 export type StationOutage = {
