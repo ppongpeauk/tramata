@@ -3,7 +3,7 @@
  * 12-25-2024
  */
 
-import { BaseModel } from "../BaseModel.model";
+import { BaseModel } from "../base";
 import { convertTimeToTimestamp, downloadStaticGtfs } from "@/utils/gtfs";
 import * as schema from "@/db/schema";
 import { StopTime, Trip } from "gtfs-types";

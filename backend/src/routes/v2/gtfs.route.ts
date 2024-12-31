@@ -5,7 +5,6 @@ import { wmataApi } from "@/utils/web";
 import { downloadStaticGtfs } from "@/utils/gtfs";
 import { GTFSRealtimeModel } from "@/models/gtfs/GTFSRealtime.model";
 import { GTFSStaticModel } from "@/models/gtfs/GTFSStatic.model";
-import { TrainModel } from "@/models/Train.model";
 const app = new OpenAPIHono<GenericHono>();
 
 const routes = {

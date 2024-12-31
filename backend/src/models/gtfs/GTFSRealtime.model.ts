@@ -1,4 +1,4 @@
-import { BaseModel } from "../BaseModel.model";
+import { BaseModel } from "../base";
 import { wmataApi } from "@/utils/web";
 import {
 	FeedEntity,

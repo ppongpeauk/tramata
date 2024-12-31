@@ -1,0 +1,12 @@
+[
+    {
+        "agency_id": "1",
+        "agency_name": "WMATA_rail",
+        "agency_url": "https://www.wmata.com",
+        "agency_timezone": "America/New_York",
+        "agency_lang": "en",
+        "agency_phone": "(202) 637-7000",
+        "agency_fare_url": "https://www.wmata.com/fares/",
+        "agency_email": "csvc@wmata.com"
+    }
+]
