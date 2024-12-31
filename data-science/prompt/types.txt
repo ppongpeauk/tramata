@@ -1,0 +1,28 @@
+STOP
+{
+    "stop_id":"STN_N06",
+    "stop_name":"WIEHLE-RESTON EAST METRORAIL STATION",
+    "stop_desc":null,
+    "stop_lat":38.94783193,
+    "stop_lon":-77.34031555,
+    "zone_id":91,
+    "location_type":1,
+    "parent_station":null,
+    "wheelchair_boarding":1,
+    "level_id":null,
+    "agency_id":"WMATA_RAIL"
+},
+
+TRIP
+{
+    "route_id":"RED",
+    "service_id":"54_R",
+    "trip_id":"6576114_20078",
+    "trip_headsign":"GLENMONT",
+    "direction_id":0,
+    "block_id":null,
+    "shape_id":"RRED_1",
+    "scheduled_trip_id":6576114.0,
+    "train_id":124,
+    "agency_id":"WMATA_RAIL"
+},

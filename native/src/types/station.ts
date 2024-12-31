@@ -30,7 +30,7 @@ export type Station = {
 		zip: string;
 	};
 	outages?: StationOutage[];
-	arrivals?: StationArrival[];
+	predictions?: StationArrival[];
 	lines: string[];
 	parking?: StationParking;
 };

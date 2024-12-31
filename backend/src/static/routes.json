@@ -1,0 +1,86 @@
+[
+    {
+        "route_id": "RED",
+        "agency_id": "WMATA_RAIL",
+        "route_short_name": "Red",
+        "route_long_name": "Metrorail Red Line",
+        "route_type": 1,
+        "route_url": "",
+        "route_color": "E31837",
+        "as_route": 1,
+        "network_id": "Metrorail",
+        "route_text_color": "FFFFFF"
+    },
+    {
+        "route_id": "BLUE",
+        "agency_id": "WMATA_RAIL",
+        "route_short_name": "Blue",
+        "route_long_name": "Metrorail Blue Line",
+        "route_type": 1,
+        "route_url": "",
+        "route_color": "0076C0",
+        "as_route": 1,
+        "network_id": "Metrorail",
+        "route_text_color": "FFFFFF"
+    },
+    {
+        "route_id": "GREEN",
+        "agency_id": "WMATA_RAIL",
+        "route_short_name": "Green",
+        "route_long_name": "Metrorail Green Line",
+        "route_type": 1,
+        "route_url": "",
+        "route_color": "00A94F",
+        "as_route": 1,
+        "network_id": "Metrorail",
+        "route_text_color": "FFFFFF"
+    },
+    {
+        "route_id": "YELLOW",
+        "agency_id": "WMATA_RAIL",
+        "route_short_name": "Yellow",
+        "route_long_name": "Metrorail Yellow Line",
+        "route_type": 1,
+        "route_url": "",
+        "route_color": "FFD200",
+        "as_route": 1,
+        "network_id": "Metrorail",
+        "route_text_color": "000000"
+    },
+    {
+        "route_id": "ORANGE",
+        "agency_id": "WMATA_RAIL",
+        "route_short_name": "Orange",
+        "route_long_name": "Metrorail Orange Line",
+        "route_type": 1,
+        "route_url": "",
+        "route_color": "F7941E",
+        "as_route": 1,
+        "network_id": "Metrorail",
+        "route_text_color": "000000"
+    },
+    {
+        "route_id": "SILVER",
+        "agency_id": "WMATA_RAIL",
+        "route_short_name": "Silver",
+        "route_long_name": "Metrorail Silver Line",
+        "route_type": 1,
+        "route_url": "",
+        "route_color": "A1A2A1",
+        "as_route": 1,
+        "network_id": "Metrorail",
+        "route_text_color": "000000"
+    },
+    {
+        "route_id": "SHUTTLE",
+        "agency_id": "WMATA_RAIL",
+        "route_short_name": "SHUTTLE",
+        "route_long_name": "",
+        "route_type": 3,
+        "route_url": "",
+        "route_color": "000000",
+        "as_route": 1,
+        "network_id": "Metrorail",
+        "route_text_color": "FFFFFF"
+    }
+]

@@ -126,7 +126,7 @@ export class GTFSStaticModel extends BaseModel {
 		return trips.find((trip: Trip) => trip.trip_id === tripId) ?? null;
 	}
 
-	async getStopTimes(tripId: string): Promise<StopTime[] | null> {
+	async getStopTimes(tripId: string): Promise<StopTime[]> {
 		const chunkSize = 3; // Assuming we are chunking into 3 parts
 		const stopTimes: StopTime[] = [];
 
@@ -140,6 +140,8 @@ export class GTFSStaticModel extends BaseModel {
 			}
 		}
 
-		return stopTimes.length > 0 ? stopTimes : null;
+		return (
+			stopTimes.filter((stopTime) => stopTime.trip_id === tripId) ?? []
+		);
 	}
 }

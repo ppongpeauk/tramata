@@ -28,9 +28,7 @@ import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { lines } from "@/constants/lines";
 import OutageUnitSymbol from "@/components/outage-unit-symbol";
 import { Station } from "@/types/station";
-import PrimaryTrainButton, {
-	StationTrainPredictionWithStation,
-} from "@/components/primary-train-button";
+import PrimaryTrainButton from "@/components/primary-train-button";
 import { useQuery } from "@tanstack/react-query";
 import LineSymbol from "@/components/line-symbol";
 import { LinearGradient } from "expo-linear-gradient";
@@ -332,11 +330,9 @@ function ArrivalsTab({
 				return (
 					<PrimaryTrainButton
 						lineAbbr={item.line}
-						train={
-							{
-								...item,
-							} as StationTrainPredictionWithStation
-						}
+						train={{
+							...item,
+						}}
 						key={index}
 					/>
 				);

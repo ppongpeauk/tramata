@@ -11,6 +11,7 @@ const routes = {
 	updateStatic: createRoute({
 		method: "get",
 		path: "/update-static",
+		tags: ["GTFS"],
 		responses: {
 			200: {
 				description: "Success",
@@ -20,6 +21,7 @@ const routes = {
 	tripUpdates: createRoute({
 		method: "get",
 		path: "/realtime/trip-updates",
+		tags: ["GTFS"],
 		responses: {
 			200: {
 				description: "Success",
@@ -29,6 +31,7 @@ const routes = {
 	vehiclePositions: createRoute({
 		method: "get",
 		path: "/realtime/vehicle-positions",
+		tags: ["GTFS"],
 		responses: {
 			200: {
 				description: "Success",
@@ -38,6 +41,7 @@ const routes = {
 	alerts: createRoute({
 		method: "get",
 		path: "/realtime/alerts",
+		tags: ["GTFS"],
 		responses: {
 			200: {
 				description: "Success",
@@ -47,6 +51,7 @@ const routes = {
 	stops: createRoute({
 		method: "get",
 		path: "/static/stops",
+		tags: ["GTFS"],
 		responses: {
 			200: {
 				description: "Success",
@@ -56,6 +61,7 @@ const routes = {
 	clearCache: createRoute({
 		method: "get",
 		path: "/clear-cache",
+		tags: ["GTFS"],
 		responses: {
 			200: {
 				description: "Success",
@@ -65,6 +71,7 @@ const routes = {
 	test: createRoute({
 		method: "get",
 		path: "/test",
+		tags: ["GTFS"],
 		responses: {
 			200: {
 				description: "Success",
@@ -122,12 +129,6 @@ app.openapi(routes.clearCache, async (c) => {
 	// await gtfsStaticModel.clearCache();
 
 	return c.json({ message: "Cache cleared." });
-});
-
-app.openapi(routes.test, async (c) => {
-	const trainModel = new TrainModel(c);
-	const trains = await trainModel.getTrains();
-	return c.json(trains);
 });
 
 export default app;

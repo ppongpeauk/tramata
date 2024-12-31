@@ -9,10 +9,12 @@ import map from "@/constants/map";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTrainWebsocket } from "@/contexts/websocket";
 import mapping from "@/constants/mapping";
+import { Alert } from "@/api/alerts";
 
 export type LineData = {
 	lineCode: string;
 	displayName: string;
+	alerts: Alert[];
 	startStationCode: string;
 	endStationCode: string;
 	internalDestination1: string;
@@ -220,9 +222,9 @@ export default function LineView({
 					{data?.stations.map((station, index) => {
 						const topBottomRounded =
 							index === 0
-								? "rounded-t-full"
+								? "rounded-t-lg"
 								: index === data.stations.length - 1
-								? "rounded-b-full"
+								? "rounded-b-lg"
 								: "";
 						const yPosition = Array.from(lineHeights.values())
 							.slice(0, index)

@@ -11,20 +11,9 @@ import {
 	Alert as GTFSAlert,
 	VehiclePosition as GTFSVehiclePosition,
 	Entity,
+	TripUpdate,
 } from "gtfs-types";
 import { getCachedObject, setCachedObject } from "@/utils/cache";
-import { GTFSStaticModel } from "./GTFSStatic.model";
-
-export type TripUpdate = {
-	tripId: string;
-	routeId: string;
-	stopTimeUpdates: {
-		stopId: string;
-		arrival: number | null;
-		departure: number | null;
-	}[];
-	trip?: TripDescriptor;
-};
 
 export type VehiclePosition = {
 	vehicleId: string;
@@ -103,27 +92,6 @@ export class GTFSRealtimeModel extends BaseModel {
 			60
 		);
 
-		// /**
-		//  * Merge the trip updates with the static data.
-		//  */
-		// const gtfsStaticModel = new GTFSStaticModel(this.ctx);
-		// const staticTrips = await gtfsStaticModel.getTrips();
-
-		// const mergedTripUpdates: TripUpdate[] = [];
-		// for (const tripUpdate of tripUpdates) {
-		// 	const staticTrip = staticTrips.find(
-		// 		(trip) => trip.trip_id === tripUpdate?.trip?.tripId
-		// 	);
-		// 	if (!staticTrip) continue;
-
-		// 	mergedTripUpdates.push({
-		// 		...tripUpdate,
-		// 		...staticTrip,
-		// 	});
-		// }
-
-		// return mergedTripUpdates as unknown as Entity[];
-
 		return tripUpdates as unknown as Entity[];
 	}
 
@@ -164,12 +132,12 @@ export class GTFSRealtimeModel extends BaseModel {
 	/**
 	 * Get trip updates for all active trips
 	 */
-	async getTripUpdates(): Promise<Entity[]> {
+	async getTripUpdates(): Promise<TripUpdate[]> {
 		const cached = (await getCachedObject(
 			this.ctx,
 			"tripUpdates",
 			"json"
-		)) as Entity[] | null;
+		)) as TripUpdate[] | null;
 
 		if (cached) {
 			console.debug(`[GTFSRealtime] Using cached trip updates.`);
@@ -178,7 +146,7 @@ export class GTFSRealtimeModel extends BaseModel {
 
 		console.debug(`[GTFSRealtime] Fetching trip updates from API.`);
 		const feed = await this.refreshTripUpdates();
-		return feed as unknown as Entity[];
+		return feed as unknown as TripUpdate[];
 	}
 
 	/**

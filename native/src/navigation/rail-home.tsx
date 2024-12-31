@@ -8,12 +8,13 @@ import {
 import { Text } from "@/components/ui/Text";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { lines } from "@/constants/lines";
+import { lines as lineMappings } from "@/constants/lines";
 import LineSymbol from "@/components/line-symbol";
-import * as Haptics from "expo-haptics";
 import { NearbyTrainButtons } from "@/components/modules/nearby-train-buttons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { buttonHaptics } from "@/utils/haptics";
+import { useQuery } from "@tanstack/react-query";
+import { APILine, getLines } from "@/api/lines";
 
 export const RailHomeStack = createNativeStackNavigator({
 	screens: {
@@ -28,6 +29,19 @@ export const RailHomeStack = createNativeStackNavigator({
 });
 
 export default function RailHome() {
+	const {
+		data: linesData,
+		isLoading: linesLoading,
+		refetch: refetchLines,
+	} = useQuery({
+		queryKey: ["lines"],
+		queryFn: async () => {
+			const lines = await getLines();
+			return lines;
+		},
+		initialData: [],
+	});
+
 	return (
 		<SafeAreaView className="flex-1">
 			<View className="flex-1 items-center justify-center">
@@ -35,8 +49,10 @@ export default function RailHome() {
 					className="flex-1 w-full"
 					refreshControl={
 						<RefreshControl
-							refreshing={false}
-							onRefresh={() => {}}
+							refreshing={linesLoading}
+							onRefresh={() => {
+								refetchLines();
+							}}
 						/>
 					}
 					ItemSeparatorComponent={() => (
@@ -60,12 +76,8 @@ export default function RailHome() {
 					)}
 					sections={[
 						{
-							title: "Nearby Trains",
-							data: [<NearbyTrainButtons />],
-						},
-						{
 							title: "Lines",
-							data: lines.map((line) => (
+							data: linesData?.map((line) => (
 								<LineButton item={line} />
 							)),
 						},
@@ -81,7 +93,7 @@ export default function RailHome() {
 	);
 }
 
-function LineButton({ item }: { item: (typeof lines)[number] }) {
+function LineButton({ item }: { item: APILine }) {
 	const navigation = useNavigation();
 	return (
 		<TouchableOpacity
@@ -90,30 +102,39 @@ function LineButton({ item }: { item: (typeof lines)[number] }) {
 			onPress={() => {
 				buttonHaptics();
 				navigation.navigate("Line", {
-					code: item.abbr,
+					code: item.lineCode,
 				} as never);
 			}}
 		>
-			<LineSymbol code={item.abbr} />
-			<View className="flex-1 flex-col">
+			<LineSymbol code={item.lineCode} />
+			<View className="flex flex-1 flex-col flex-shrink">
 				<Text className={"text-text"} weight="bold">
-					{item.title}
+					{item.displayName}
 				</Text>
 				<Text
-					className="text-text-secondary flex-shrink"
+					className="text-text-secondary"
 					size="xs"
 					weight="normal"
 					numberOfLines={1}
 					ellipsizeMode="tail"
 				>
-					{item.stationStart} — {item.stationEnd}
+					{item.startStation.name} — {item.endStation.name}
 				</Text>
 			</View>
-			<Ionicons
-				name="chevron-forward"
-				size={16}
-				className="ml-auto text-text-secondary"
-			/>
+			<View className="flex flex-row items-center justify-end gap-2">
+				{item.alerts.length ? (
+					<View className="w-5 h-5 bg-red-500 rounded-full border border-red-600 items-center justify-center">
+						<Text className="text-white" size="xxs" weight="bold">
+							{item.alerts.length}
+						</Text>
+					</View>
+				) : null}
+				<Ionicons
+					name="chevron-forward"
+					size={16}
+					className="ml-auto text-text-secondary"
+				/>
+			</View>
 		</TouchableOpacity>
 	);
 }

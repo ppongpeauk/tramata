@@ -1,0 +1,456 @@
+{
+  "PF_A15_C": [
+    "RED"
+  ],
+  "PF_A14_C": [
+    "RED"
+  ],
+  "PF_A13_C": [
+    "RED"
+  ],
+  "PF_A12_C": [
+    "RED"
+  ],
+  "PF_A11_C": [
+    "RED"
+  ],
+  "PF_A10_C": [
+    "RED"
+  ],
+  "PF_A09_C": [
+    "RED"
+  ],
+  "PF_A08_C": [
+    "RED"
+  ],
+  "PF_A07_C": [
+    "RED"
+  ],
+  "PF_A06_C": [
+    "RED"
+  ],
+  "PF_A05_C": [
+    "RED"
+  ],
+  "PF_A04_C": [
+    "RED"
+  ],
+  "PF_A03_1": [
+    "RED"
+  ],
+  "PF_A02_C": [
+    "SHUTTLE",
+    "RED"
+  ],
+  "PF_A01_1": [
+    "SHUTTLE",
+    "RED"
+  ],
+  "PF_B01_1": [
+    "RED"
+  ],
+  "PF_B02_1": [
+    "RED"
+  ],
+  "PF_B03_C": [
+    "RED"
+  ],
+  "PF_B35_C": [
+    "RED"
+  ],
+  "PF_B04_C": [
+    "RED"
+  ],
+  "PF_B05_C": [
+    "RED"
+  ],
+  "PF_B06_C": [
+    "RED"
+  ],
+  "PF_B07_C": [
+    "RED"
+  ],
+  "PF_B08_C": [
+    "RED"
+  ],
+  "PF_B09_C": [
+    "RED"
+  ],
+  "PF_B10_C": [
+    "RED"
+  ],
+  "PF_B11_C": [
+    "RED"
+  ],
+  "PF_B02_2": [
+    "RED"
+  ],
+  "PF_B01_2": [
+    "RED"
+  ],
+  "PF_A01_2": [
+    "RED"
+  ],
+  "PF_A03_2": [
+    "RED"
+  ],
+  "PF_G05_C": [
+    "SILVER",
+    "BLUE"
+  ],
+  "PF_G04_C": [
+    "SILVER",
+    "BLUE"
+  ],
+  "PF_G03_C": [
+    "SILVER",
+    "BLUE"
+  ],
+  "PF_G02_C": [
+    "SILVER",
+    "BLUE"
+  ],
+  "PF_G01_C": [
+    "SILVER",
+    "BLUE"
+  ],
+  "PF_D08_C": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_D07_C": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_D06_C": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_D05_C": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_D04_C": [
+    "SILVER",
+    "SHUTTLE",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_D03_C": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_D02_2": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_D01_C": [
+    "SILVER",
+    "SHUTTLE",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_C01_C": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_C02_2": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_C03_2": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_C04_C": [
+    "SILVER",
+    "SHUTTLE",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_C05_2": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_C06_2": [
+    "BLUE"
+  ],
+  "PF_C07_2": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C08_2": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C09_2": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C10_2": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C11_2": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C12_C": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C13_C": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_J02_C": [
+    "BLUE"
+  ],
+  "PF_J03_C": [
+    "BLUE"
+  ],
+  "PF_C05_1": [
+    "SILVER",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_C11_1": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C10_1": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C09_1": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C08_1": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C07_1": [
+    "BLUE",
+    "YELLOW"
+  ],
+  "PF_C06_1": [
+    "BLUE"
+  ],
+  "PF_C03_1": [
+    "SILVER",
+    "SHUTTLE",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_C02_1": [
+    "SILVER",
+    "SHUTTLE",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_D02_1": [
+    "SILVER",
+    "SHUTTLE",
+    "BLUE",
+    "ORANGE"
+  ],
+  "PF_F11_C": [
+    "GREEN"
+  ],
+  "PF_F10_C": [
+    "GREEN"
+  ],
+  "PF_F09_C": [
+    "GREEN"
+  ],
+  "PF_F08_C": [
+    "GREEN"
+  ],
+  "PF_F07_C": [
+    "GREEN"
+  ],
+  "PF_F06_C": [
+    "GREEN"
+  ],
+  "PF_F05_C": [
+    "GREEN"
+  ],
+  "PF_F04_C": [
+    "GREEN"
+  ],
+  "PF_F03_1": [
+    "YELLOW",
+    "GREEN"
+  ],
+  "PF_F02_C": [
+    "YELLOW",
+    "GREEN"
+  ],
+  "PF_F01_C": [
+    "SHUTTLE",
+    "YELLOW",
+    "GREEN"
+  ],
+  "PF_E01_C": [
+    "YELLOW",
+    "GREEN"
+  ],
+  "PF_E02_C": [
+    "GREEN"
+  ],
+  "PF_E03_C": [
+    "GREEN"
+  ],
+  "PF_E04_C": [
+    "GREEN"
+  ],
+  "PF_E05_C": [
+    "GREEN"
+  ],
+  "PF_E06_C": [
+    "GREEN"
+  ],
+  "PF_E07_1": [
+    "GREEN"
+  ],
+  "PF_E08_1": [
+    "GREEN"
+  ],
+  "PF_E09_C": [
+    "GREEN"
+  ],
+  "PF_E10_C": [
+    "GREEN"
+  ],
+  "PF_F03_2": [
+    "SHUTTLE",
+    "YELLOW",
+    "GREEN"
+  ],
+  "PF_E08_2": [
+    "GREEN"
+  ],
+  "PF_E07_2": [
+    "GREEN"
+  ],
+  "PF_C15_C": [
+    "YELLOW"
+  ],
+  "PF_C14_1": [
+    "YELLOW"
+  ],
+  "PF_C14_2": [
+    "YELLOW"
+  ],
+  "PF_D13_C": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_D12_C": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_D11_2": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_D10_C": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_D09_C": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_K01_C": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_K02_2": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_K03_2": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_K04_2": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_K05_C": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_K06_2": [
+    "ORANGE"
+  ],
+  "PF_K07_C": [
+    "ORANGE"
+  ],
+  "PF_K08_C": [
+    "ORANGE"
+  ],
+  "PF_K02_1": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_K03_1": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_K06_1": [
+    "ORANGE"
+  ],
+  "PF_K04_1": [
+    "SILVER",
+    "ORANGE"
+  ],
+  "PF_D11_1": [
+    "ORANGE"
+  ],
+  "PF_N01_C": [
+    "SILVER"
+  ],
+  "PF_N02_C": [
+    "SILVER"
+  ],
+  "PF_N03_C": [
+    "SILVER"
+  ],
+  "PF_N04_C": [
+    "SILVER"
+  ],
+  "PF_N06_C": [
+    "SILVER"
+  ],
+  "PF_N07_C": [
+    "SILVER"
+  ],
+  "PF_N08_C": [
+    "SILVER"
+  ],
+  "PF_N09_C": [
+    "SILVER"
+  ],
+  "PF_N10_C": [
+    "SILVER"
+  ],
+  "PF_N11_C": [
+    "SILVER"
+  ],
+  "PF_N12_C": [
+    "SILVER"
+  ]
+}

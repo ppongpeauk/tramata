@@ -63,12 +63,12 @@ export default function Line() {
 						<TouchableOpacity
 							onPress={() =>
 								navigation.navigate("LineAlerts", {
-									id: line?.id,
+									alerts: lineData?.alerts,
 								} as never)
 							}
 						>
 							<Ionicons
-								name="information-circle-outline"
+								name="alert-circle-outline"
 								size={24}
 								className="text-text"
 							/>

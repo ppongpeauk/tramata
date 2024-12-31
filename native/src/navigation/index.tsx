@@ -113,7 +113,7 @@ const RootStack = createNativeStackNavigator({
 			},
 			options: ({ navigation }) => ({
 				presentation: "modal",
-				title: "Alerts",
+				title: "Line Alerts",
 				headerShown: true,
 				headerLeft: () => (
 					<TouchableOpacity onPress={() => navigation.goBack()}>

@@ -1,7 +1,7 @@
 [
     {
-        "agency_id": "1",
-        "agency_name": "WMATA_rail",
+        "agency_id": "WMATA_RAIL",
+        "agency_name": "WMATA",
         "agency_url": "https://www.wmata.com",
         "agency_timezone": "America/New_York",
         "agency_lang": "en",
