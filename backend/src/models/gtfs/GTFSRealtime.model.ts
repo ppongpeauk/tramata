@@ -76,6 +76,38 @@ export type ServiceAlert = {
 	}[];
 };
 
+export type APIAlert = {
+	activePeriod: any[];
+	informedEntity: {
+		agencyId: string;
+		routeId: string;
+		routeType: number;
+		stopId: string;
+		directionId: number;
+	}[];
+	cause: number;
+	effect: number;
+	url: {
+		translation: {
+			text: string;
+			language: string;
+		}[];
+	};
+	headerText: {
+		translation: {
+			text: string;
+			language: string;
+		}[];
+	};
+	descriptionText: {
+		translation: {
+			text: string;
+			language: string;
+		}[];
+	};
+	severityLevel: number;
+};
+
 export class GTFSRealtimeModel extends BaseModel {
 	/**
 	 * Fetches and decodes a GTFS Realtime feed from WMATA
@@ -209,23 +241,23 @@ export class GTFSRealtimeModel extends BaseModel {
 	/**
 	 * Get all active service alerts
 	 */
-	async getAlerts(): Promise<Entity[]> {
+	async getAlerts(): Promise<APIAlert[]> {
 		/**
 		 * Check if the data is cached.
 		 * If it is, return the cached data.
 		 * If it isn't, fetch the data from the API and cache it.
 		 */
 		const cached = (await getCachedObject(this.ctx, "alerts", "json")) as
-			| Entity[]
+			| APIAlert[]
 			| null;
 
 		if (cached) {
 			console.debug(`[GTFSRealtime] Using cached alerts.`);
-			return cached;
+			return cached as unknown as APIAlert[];
 		}
 
 		console.debug(`[GTFSRealtime] Fetching alerts from API.`);
 		const feed = await this.refreshAlerts();
-		return feed as unknown as Entity[];
+		return feed as unknown as APIAlert[];
 	}
 }

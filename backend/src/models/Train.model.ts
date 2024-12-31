@@ -31,6 +31,7 @@ export type Train = {
 	line: Line;
 	trip: {
 		id: string;
+		startTime: Date;
 		routeId: string;
 		directionId: string;
 	};
@@ -217,6 +218,7 @@ export class TrainModel extends BaseModel {
 				line,
 				trip: {
 					id: tpTrip.tripId,
+					startTime: new Date(tpTrip.startTime),
 					routeId: tpTrip.routeId,
 					directionId: tpTrip.directionId.toString(),
 				},
@@ -234,7 +236,6 @@ export class TrainModel extends BaseModel {
 		if (!trip) throw new TrainNotFoundError();
 
 		const trainPositions = await gtfsRealtimeModel.getVehiclePositions();
-		console.log(trainPositions[0]);
 		const trainPosition = trainPositions.find(
 			(train) => train.trip.tripId === tripId
 		);
@@ -256,6 +257,7 @@ export class TrainModel extends BaseModel {
 			},
 			trip: {
 				id: trainPosition.trip.tripId,
+				startTime: new Date(trainPosition.trip.startTime),
 				routeId: trainPosition.trip.routeId,
 				directionId: trainPosition.trip.directionId.toString(),
 			},

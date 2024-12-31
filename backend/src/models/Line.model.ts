@@ -3,13 +3,12 @@
  * 12-21-2024
  */
 
-import { wmataApi } from "@/utils/web";
 import { BaseModel } from "./BaseModel.model";
 import { Station, StationModel } from "./Station.model";
-import { getCachedObject, setCachedObject } from "@/utils/cache";
 import { TrackModel } from "./Track.model";
 import { RouteModel, RouteNotFoundError } from "./Route.model";
 import linesData from "@/static/api_lines.json";
+import { Alert, AlertModel } from "./Alert.model";
 
 export type APILine = {
 	LineCode: string;
@@ -26,6 +25,8 @@ export type Line = {
 
 	startStationCode: string;
 	endStationCode: string;
+
+	alerts: Alert[];
 
 	startStation?: Station;
 	endStation?: Station;
@@ -45,6 +46,9 @@ export class LineModel extends BaseModel {
 		const stationModel = new StationModel(this.ctx);
 		const stations = await stationModel.list();
 
+		const alertModel = new AlertModel(this.ctx);
+		const alerts = await alertModel.list();
+
 		const response = apiData.Lines.map((line) => ({
 			lineCode: line.LineCode,
 			displayName: line.DisplayName,
@@ -60,6 +64,10 @@ export class LineModel extends BaseModel {
 			),
 			endStation: stations.find(
 				(station) => station.code === line.EndStationCode
+			),
+
+			alerts: alerts.filter((alert) =>
+				alert.lineCodes.includes(line.LineCode)
 			),
 
 			stations: stations.filter((station) =>
@@ -116,6 +124,12 @@ export class LineModel extends BaseModel {
 		}
 
 		/**
+		 * Get all outages for all stations.
+		 * We're doing this here so we don't have to call the cache every time we get a station.
+		 */
+		const outages = await stationModel.listAllOutages();
+
+		/**
 		 * Start from the first station code and traverse the stations in order.
 		 * Add the station codes to the array.
 		 */
@@ -124,10 +138,9 @@ export class LineModel extends BaseModel {
 				(station) => station.code === stationCode
 			);
 			if (station) {
-				const outages = await stationModel.listOutagesByStationCode(
-					stationCode
+				station.outages = outages.filter(
+					(outage) => outage.stationCode === stationCode
 				);
-				station.outages = outages;
 				stationsSorted.push(station);
 			}
 		}

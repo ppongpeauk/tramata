@@ -6,7 +6,7 @@ import lines from "./lines.route";
 import stations from "./stations.route";
 import routines from "./routines.route";
 import trips from "./trips.route";
-
+import alerts from "./alerts.route";
 const app = new OpenAPIHono<GenericHono>();
 
 app.route("/trains", trains);
@@ -14,7 +14,7 @@ app.route("/lines", lines);
 app.route("/stations", stations);
 app.route("/routines", routines);
 app.route("/trips", trips);
-
+app.route("/alerts", alerts);
 app.openapi(
 	createRoute({
 		method: "get",
