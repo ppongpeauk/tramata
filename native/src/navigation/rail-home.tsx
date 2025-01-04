@@ -8,14 +8,14 @@ import {
 import { Text } from "@/components/ui/Text";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { lines as lineMappings } from "@/constants/lines";
+import { lines as lineMappings, lines } from "@/constants/lines";
 import LineSymbol from "@/components/line-symbol";
 import { NearbyTrainButtons } from "@/components/modules/nearby-train-buttons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { buttonHaptics } from "@/utils/haptics";
 import { useQuery } from "@tanstack/react-query";
-import { APILine, getLines } from "@/api/lines";
-
+import { getLines } from "@/api/lines";
+import { Route } from "@/types/route";
 export const RailHomeStack = createNativeStackNavigator({
 	screens: {
 		RailHome: {
@@ -39,7 +39,7 @@ export default function RailHome() {
 			const lines = await getLines();
 			return lines;
 		},
-		initialData: [],
+		initialData: undefined,
 	});
 
 	return (
@@ -77,9 +77,10 @@ export default function RailHome() {
 					sections={[
 						{
 							title: "Lines",
-							data: linesData?.map((line) => (
-								<LineButton item={line} />
-							)),
+							data:
+								linesData?.routes.map((route) => (
+									<LineButton item={route} />
+								)) ?? [],
 						},
 						{
 							title: "System Map",
@@ -93,23 +94,24 @@ export default function RailHome() {
 	);
 }
 
-function LineButton({ item }: { item: APILine }) {
+function LineButton({ item }: { item: Route }) {
 	const navigation = useNavigation();
+	const line = lines.find((line) => line.route_id === item.route_id);
 	return (
 		<TouchableOpacity
 			activeOpacity={0.5}
 			className="flex flex-row items-center gap-3 bg-white dark:bg-neutral-950 p-4"
 			onPress={() => {
 				buttonHaptics();
-				navigation.navigate("Line", {
-					code: item.lineCode,
+				navigation.navigate("RailLine", {
+					routeId: item.route_id,
 				} as never);
 			}}
 		>
-			<LineSymbol code={item.lineCode} />
+			<LineSymbol routeId={item.route_id} />
 			<View className="flex flex-1 flex-col flex-shrink">
 				<Text className={"text-text"} weight="bold">
-					{item.displayName}
+					{item.route_short_name}
 				</Text>
 				<Text
 					className="text-text-secondary"
@@ -118,17 +120,18 @@ function LineButton({ item }: { item: APILine }) {
 					numberOfLines={1}
 					ellipsizeMode="tail"
 				>
-					{item.startStation.name} — {item.endStation.name}
+					{item.headsigns[0] ?? "From Station"} —{" "}
+					{item.headsigns[1] ?? "To Station"}
 				</Text>
 			</View>
 			<View className="flex flex-row items-center justify-end gap-2">
-				{item.alerts.length ? (
+				{/* {item.alerts.length ? (
 					<View className="w-5 h-5 bg-red-500 rounded-full border border-red-600 items-center justify-center">
 						<Text className="text-white" size="xxs" weight="bold">
 							{item.alerts.length}
 						</Text>
 					</View>
-				) : null}
+				) : null} */}
 				<Ionicons
 					name="chevron-forward"
 					size={16}

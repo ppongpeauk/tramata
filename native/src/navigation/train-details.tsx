@@ -1,4 +1,4 @@
-import { StationArrivalWithStation } from "@/components/primary-train-button";
+import { PredictionWithStation } from "@/components/primary-train-button";
 import { Text } from "@/components/ui/Text";
 import { Ionicons } from "@/components/VectorIcons";
 import { Train } from "@/types/train";
@@ -14,20 +14,20 @@ export default function TrainDetails() {
 	const route = useRoute();
 
 	const { train } = route.params as {
-		train: StationArrivalWithStation;
+		train: PredictionWithStation;
 	};
 
 	const { data, isLoading, refetch } = useQuery<Train>({
-		queryKey: ["train-details", train.tripId],
+		queryKey: ["train-details", train.trip_id],
 		queryFn: async () => {
-			const { data } = await api.get(`/v1/trips/${train.tripId}`);
+			const { data } = await api.get(`/v1/trips/${train.trip_id}`);
 			return data;
 		},
 	});
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: train.destinationName,
+			title: train.destination_name,
 			headerLeft: () => (
 				<TouchableOpacity onPress={() => navigation.goBack()}>
 					<Ionicons name="close" size={24} className="text-text" />
@@ -37,7 +37,7 @@ export default function TrainDetails() {
 				<View className="flex-row gap-1 items-center justify-center px-2 py-1 border border-border rounded-md">
 					<Ionicons name="train" size={12} className="text-text" />
 					<Text weight="medium" size="xs" className="text-text">
-						{data?.vehicle.id}
+						{train.train_id}
 					</Text>
 				</View>
 			),

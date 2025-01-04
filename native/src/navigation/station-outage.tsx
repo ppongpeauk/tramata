@@ -7,21 +7,24 @@ import { Ionicons } from "@/components/VectorIcons";
 import OutageUnitSymbol from "@/components/outage-unit-symbol";
 import { Text } from "@/components/ui/Text";
 import moment from "moment";
+import { Outage } from "@/types/outage";
 export default function OutageDetails() {
 	const route = useRoute();
 	const navigation = useNavigation();
-	const { data } = route.params as { data: StationOutage };
+	const { data } = route.params as { data: Outage };
 
-	const dateStringOutOfService = moment(data.dateOutOfServ).calendar();
+	const dateStringOutOfService = moment(data.date_out_of_serv).calendar();
 	const dateStringEstimatedReturnToService = moment(
-		data.estimatedReturnToService
+		data.estimated_return_to_service
 	).calendar();
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerTitle: () => (
 				<View className="flex-row items-center gap-2">
-					<OutageUnitSymbol unitType={data.unitType} />
+					<OutageUnitSymbol
+						unitType={data.unit_type as "ESCALATOR" | "ELEVATOR"}
+					/>
 					<Text weight="semiBold" size="md" className="text-text">
 						Outage Details
 					</Text>
@@ -35,7 +38,7 @@ export default function OutageDetails() {
 			headerRight: () => (
 				<View className="items-center justify-center px-2 py-1 border border-border rounded-md">
 					<Text weight="medium" size="xs" className="text-text">
-						{data.unitName}
+						{data.unit_name}
 					</Text>
 				</View>
 			),
@@ -43,19 +46,19 @@ export default function OutageDetails() {
 	}, [navigation, data]);
 
 	const makeOutageDescription = useMemo(() => {
-		const includesGarage = data.locationDescription
+		const includesGarage = data.location_description
 			.toLowerCase()
 			.includes("garage");
 
 		if (includesGarage) {
 			return `The parking garage elevator at ${
-				data.stationName
-			} is out for ${data.symptomDescription.toLowerCase()}.`;
+				data.station_name
+			} is out for ${data.symptom_description.toLowerCase()}.`;
 		}
 
-		return `${data.locationDescription} at ${
-			data.stationName
-		} is out for ${data.symptomDescription.toLowerCase()}.`;
+		return `${data.location_description} at ${
+			data.station_name
+		} is out for ${data.symptom_description.toLowerCase()}.`;
 	}, [data]);
 
 	return (

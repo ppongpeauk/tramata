@@ -126,7 +126,13 @@ export class GTFSStaticModel extends BaseModel {
 		return trips.find((trip: Trip) => trip.trip_id === tripId) ?? null;
 	}
 
-	async getStopTimes(tripId: string): Promise<StopTime[]> {
+	async getStopTimesByStopIds({
+		stopIds,
+		limit,
+	}: {
+		stopIds: string[];
+		limit?: number;
+	}): Promise<StopTime[]> {
 		const chunkSize = 3; // Assuming we are chunking into 3 parts
 		const stopTimes: StopTime[] = [];
 
@@ -139,6 +145,33 @@ export class GTFSStaticModel extends BaseModel {
 				stopTimes.push(...chunk);
 			}
 		}
+
+		const filteredStopTimes = stopTimes.filter((stopTime) =>
+			stopIds.includes(stopTime.stop_id)
+		);
+
+		if (limit) {
+			return filteredStopTimes.slice(0, limit);
+		}
+
+		return filteredStopTimes;
+	}
+
+	async getStopTimesByTripId(tripId: string): Promise<StopTime[]> {
+		const chunkSize = 3; // Assuming we are chunking into 3 parts
+		const stopTimes: StopTime[] = [];
+
+		for (let i = 0; i < chunkSize; i++) {
+			const chunk = await getCachedObject(
+				this.ctx,
+				`stop_times:chunk_${i}`
+			);
+			if (chunk) {
+				stopTimes.push(...chunk);
+			}
+		}
+
+		console.log(stopTimes.slice(0, 10));
 
 		return (
 			stopTimes.filter((stopTime) => stopTime.trip_id === tripId) ?? []

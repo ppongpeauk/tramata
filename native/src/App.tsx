@@ -19,7 +19,6 @@ import { TrainWebsocketProvider } from "./contexts/websocket";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { registerForPushNotificationsAsync } from "./services/notifications";
 import { LocationProvider } from "./contexts/location";
-import { NearbyTrainProvider } from "./contexts/trains-nearby";
 
 configureReanimatedLogger({
 	level: ReanimatedLogLevel.warn,
@@ -56,36 +55,34 @@ export function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<LocationProvider>
-				<NearbyTrainProvider>
-					<TrainWebsocketProvider>
-						<GestureHandlerRootView style={{ flex: 1 }}>
-							<View
-								style={[
-									themes["default"][colorScheme ?? "light"],
-									{ flex: 1 },
-								]}
-							>
-								<Navigation
-									linking={{
-										enabled: "auto",
-										prefixes: [
-											// Change the scheme to match your app's scheme defined in app.json
-											"helloworld://",
-										],
-									}}
-									onReady={() => {
-										SplashScreen.hideAsync();
-									}}
-									theme={
-										colorScheme === "dark"
-											? navigationThemes.dark
-											: navigationThemes.default
-									}
-								/>
-							</View>
-						</GestureHandlerRootView>
-					</TrainWebsocketProvider>
-				</NearbyTrainProvider>
+				<TrainWebsocketProvider>
+					<GestureHandlerRootView style={{ flex: 1 }}>
+						<View
+							style={[
+								themes["default"][colorScheme ?? "light"],
+								{ flex: 1 },
+							]}
+						>
+							<Navigation
+								linking={{
+									enabled: "auto",
+									prefixes: [
+										// Change the scheme to match your app's scheme defined in app.json
+										"helloworld://",
+									],
+								}}
+								onReady={() => {
+									SplashScreen.hideAsync();
+								}}
+								theme={
+									colorScheme === "dark"
+										? navigationThemes.dark
+										: navigationThemes.default
+								}
+							/>
+						</View>
+					</GestureHandlerRootView>
+				</TrainWebsocketProvider>
 			</LocationProvider>
 		</QueryClientProvider>
 	);

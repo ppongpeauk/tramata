@@ -16,9 +16,11 @@ import { lines } from "@/constants/lines";
 import LineSymbol from "@/components/line-symbol";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import { api } from "@/utils/web";
+import { Stop } from "@/types/stop";
+import { Parking } from "@/types/parking";
 
 type StationInfoScreenParams = {
-	station: Station;
+	station: Stop;
 };
 
 function InfoRow({ label, value }: { label: string; value: string | number }) {
@@ -51,8 +53,8 @@ function Section({
 	);
 }
 
-function ParkingSection({ parking }: { parking: StationParking }) {
-	if (!parking?.allDayParking && !parking?.shortTermParking) {
+function ParkingSection({ parking }: { parking: Parking }) {
+	if (!parking?.all_day_parking && !parking?.short_term_parking) {
 		return (
 			<Section title="Parking">
 				<Text className="text-text-secondary" weight="medium">
@@ -70,32 +72,34 @@ function ParkingSection({ parking }: { parking: StationParking }) {
 				</Text>
 			)}
 
-			{parking.allDayParking && (
+			{parking.all_day_parking && (
 				<View className="mb-4">
 					<Text className="text-text mb-2" weight="semiBold">
 						All-Day Parking
 					</Text>
 					<InfoRow
 						label="Total Spaces"
-						value={parking.allDayParking.totalCount ?? "N/A"}
+						value={parking.all_day_parking.total_count ?? "N/A"}
 					/>
 					<InfoRow
 						label="Metro Rider Cost"
 						value={`$${
-							parking.allDayParking.riderCost?.toFixed(2) ?? "N/A"
+							parking.all_day_parking.rider_cost?.toFixed(2) ??
+							"N/A"
 						}`}
 					/>
 					<InfoRow
 						label="Non-Rider Cost"
 						value={`$${
-							parking.allDayParking.nonRiderCost?.toFixed(2) ??
-							"N/A"
+							parking.all_day_parking.non_rider_cost?.toFixed(
+								2
+							) ?? "N/A"
 						}`}
 					/>
 					<InfoRow
 						label="Saturday Rider Cost"
 						value={`$${
-							parking.allDayParking.saturdayRiderCost?.toFixed(
+							parking.all_day_parking.saturday_rider_cost?.toFixed(
 								2
 							) ?? "N/A"
 						}`}
@@ -103,7 +107,7 @@ function ParkingSection({ parking }: { parking: StationParking }) {
 					<InfoRow
 						label="Saturday Non-Rider Cost"
 						value={`$${
-							parking.allDayParking.saturdayNonRiderCost?.toFixed(
+							parking.all_day_parking.saturday_non_rider_cost?.toFixed(
 								2
 							) ?? "N/A"
 						}`}
@@ -111,21 +115,21 @@ function ParkingSection({ parking }: { parking: StationParking }) {
 				</View>
 			)}
 
-			{parking.shortTermParking && (
+			{parking.short_term_parking && (
 				<View>
 					<Text className="text-text mb-2" weight="semiBold">
 						Short-Term Parking
 					</Text>
 					<InfoRow
 						label="Total Spaces"
-						value={parking.shortTermParking.totalCount}
+						value={parking.short_term_parking.total_count}
 					/>
-					{parking.shortTermParking.notes && (
+					{parking.short_term_parking.notes && (
 						<Text
 							className="text-text-secondary mt-2"
 							weight="medium"
 						>
-							{parking.shortTermParking.notes}
+							{parking.short_term_parking.notes}
 						</Text>
 					)}
 				</View>
@@ -134,21 +138,21 @@ function ParkingSection({ parking }: { parking: StationParking }) {
 	);
 }
 
-function MapPreview({ station }: { station: Station }) {
+function MapPreview({ station }: { station: Stop }) {
 	const { width } = Dimensions.get("window");
 	const ASPECT_RATIO = 16 / 9;
 	const mapHeight = width / ASPECT_RATIO;
 
 	const region = {
-		latitude: station.lat,
-		longitude: station.lon,
+		latitude: station.stop_lat,
+		longitude: station.stop_lon,
 		latitudeDelta: 0.01,
 		longitudeDelta: 0.01,
 	};
 
 	const mapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(
-		station.name + " Metro Station"
-	)}&ll=${station.lat},${station.lon}`;
+		station.stop_name
+	)}&ll=${station.stop_lat},${station.stop_lon}`;
 
 	return (
 		<Section title="Location">
@@ -171,10 +175,10 @@ function MapPreview({ station }: { station: Station }) {
 				>
 					<Marker
 						coordinate={{
-							latitude: station.lat,
-							longitude: station.lon,
+							latitude: station.stop_lat,
+							longitude: station.stop_lon,
 						}}
-						title={station.name}
+						title={station.stop_name}
 					/>
 				</MapView>
 			</TouchableOpacity>
@@ -184,8 +188,8 @@ function MapPreview({ station }: { station: Station }) {
 				activeOpacity={0.5}
 			>
 				<Text className="text-text flex-1 mr-4" weight="bold">
-					{station.address.street}, {station.address.city},{" "}
-					{station.address.state} {station.address.zip}
+					{station.address?.street}, {station.address?.city},{" "}
+					{station.address?.state} {station.address?.zip}
 				</Text>
 				<Ionicons name="navigate" size={24} className="text-text" />
 			</TouchableOpacity>
@@ -193,27 +197,20 @@ function MapPreview({ station }: { station: Station }) {
 	);
 }
 
-function LinesSection({ station }: { station: Station }) {
-	const stationLines = [
-		station.lineCode1,
-		station.lineCode2,
-		station.lineCode3,
-		station.lineCode4,
-	].filter(Boolean) as string[];
-
+function LinesSection({ station }: { station: Stop }) {
 	return (
 		<Section title="Lines">
 			<View className="flex-row flex-wrap gap-2">
-				{stationLines.map((lineCode) => {
-					const line = lines.find((l) => l.abbr === lineCode);
+				{station.route_ids.map((id) => {
+					const line = lines.find((l) => l.route_id === id);
 					if (!line) return null;
 
 					return (
 						<LineSymbol
-							code={lineCode}
+							routeId={id}
 							size="lg"
 							pressable={true}
-							key={lineCode}
+							key={id}
 						/>
 					);
 				})}
@@ -226,24 +223,26 @@ export default function StationInfo() {
 	const route = useRoute();
 	const navigation = useNavigation();
 	const params = route.params as StationInfoScreenParams;
-	const [station, setStation] = useState<Station>(params.station);
+	const [station, setStation] = useState<Stop>(params.station);
 	const [refreshing, setRefreshing] = useState(false);
 
 	const onRefresh = useCallback(async () => {
 		setRefreshing(true);
 		try {
-			const response = await api.get(`/v1/stations/${station.code}`);
+			const response = await api.get(
+				`/v1/agency/WMATA_RAIL/stops/${station.stop_id}`
+			);
 			setStation(response.data);
 		} catch (error) {
 			console.error("Failed to refresh station data:", error);
 		}
 		setRefreshing(false);
-	}, [station.code]);
+	}, [station.stop_id]);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			headerBackButtonDisplayMode: "minimal",
-			title: station.name,
+			title: station.stop_short_name ?? station.stop_name,
 		} as NativeStackNavigationOptions);
 	}, [station]);
 
@@ -257,7 +256,7 @@ export default function StationInfo() {
 			<View className="p-4">
 				<LinesSection station={station} />
 				<MapPreview station={station} />
-				<ParkingSection parking={station.parking as StationParking} />
+				<ParkingSection parking={station.parking as Parking} />
 			</View>
 		</ScrollView>
 	);

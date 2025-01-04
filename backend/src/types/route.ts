@@ -1,3 +1,4 @@
+import { Alert } from "./alert";
 import { Stop } from "./stop";
 
 export interface Route {
@@ -12,5 +13,8 @@ export interface Route {
 	network_id: string;
 	route_text_color: string;
 
+	headsigns: string[];
+
 	stops?: Stop[];
+	alerts?: Alert[];
 }

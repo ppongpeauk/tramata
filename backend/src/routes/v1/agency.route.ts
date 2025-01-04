@@ -1,9 +1,12 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { GenericHono } from "@/types";
 import { AgencyModel, AgencyNotFoundError } from "@/models/agency.model";
-
+import routeRoute from "./route.route";
+import stopRoute from "./stops.route";
 const app = new OpenAPIHono<GenericHono>();
 
+app.route("/:agency_id/routes", routeRoute);
+app.route("/:agency_id/stops", stopRoute);
 app.openapi(
 	createRoute({
 		method: "get",

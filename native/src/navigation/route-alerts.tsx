@@ -1,7 +1,7 @@
 import { FlatList, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { useRoute } from "@react-navigation/native";
-import { Alert } from "@/api/alerts";
+import { Alert } from "@/types/alert";
 
 export default function LineAlerts() {
 	const route = useRoute();
@@ -42,7 +42,7 @@ function AlertCard({ alert }: { alert: Alert }) {
 					weight="semiBold"
 					size="md"
 				>
-					{alert.message}
+					{alert.header_text}
 				</Text>
 				{/* <Text
 					className="text-text-secondary flex-shrink"

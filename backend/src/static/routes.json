@@ -9,7 +9,8 @@
         "route_color": "E31837",
         "as_route": 1,
         "network_id": "Metrorail",
-        "route_text_color": "FFFFFF"
+        "route_text_color": "FFFFFF",
+        "headsigns": ["Glenmont", "Shady Grove"]
     },
     {
         "route_id": "BLUE",
@@ -21,7 +22,8 @@
         "route_color": "0076C0",
         "as_route": 1,
         "network_id": "Metrorail",
-        "route_text_color": "FFFFFF"
+        "route_text_color": "FFFFFF",
+        "headsigns": ["Downtown Largo", "Franconia-Springfield"]
     },
     {
         "route_id": "GREEN",
@@ -33,7 +35,8 @@
         "route_color": "00A94F",
         "as_route": 1,
         "network_id": "Metrorail",
-        "route_text_color": "FFFFFF"
+        "route_text_color": "FFFFFF",
+        "headsigns": ["Greenbelt", "Branch Ave"]
     },
     {
         "route_id": "YELLOW",
@@ -45,7 +48,8 @@
         "route_color": "FFD200",
         "as_route": 1,
         "network_id": "Metrorail",
-        "route_text_color": "000000"
+        "route_text_color": "000000",
+        "headsigns": ["Mt Vernon Sq", "Huntington"]
     },
     {
         "route_id": "ORANGE",
@@ -57,7 +61,8 @@
         "route_color": "F7941E",
         "as_route": 1,
         "network_id": "Metrorail",
-        "route_text_color": "000000"
+        "route_text_color": "000000",
+        "headsigns": ["New Carrollton", "Vienna"]
     },
     {
         "route_id": "SILVER",
@@ -69,7 +74,8 @@
         "route_color": "A1A2A1",
         "as_route": 1,
         "network_id": "Metrorail",
-        "route_text_color": "000000"
+        "route_text_color": "000000",
+        "headsigns": ["Downtown Largo", "Ashburn"]
     },
     {
         "route_id": "SHUTTLE",
@@ -81,6 +87,7 @@
         "route_color": "000000",
         "as_route": 1,
         "network_id": "Metrorail",
-        "route_text_color": "FFFFFF"
+        "route_text_color": "FFFFFF",
+        "headsigns": []
     }
 ]

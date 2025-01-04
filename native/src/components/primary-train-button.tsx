@@ -15,9 +15,10 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { buttonHaptics } from "@/utils/haptics";
+import { Stop, StopPrediction } from "@/types/stop";
 
-export type StationArrivalWithStation = StationArrival & {
-	station?: Station;
+export type PredictionWithStation = StopPrediction & {
+	station?: Stop;
 };
 
 export default function PrimaryTrainButton({
@@ -26,7 +27,7 @@ export default function PrimaryTrainButton({
 	size = "md",
 }: {
 	lineAbbr: string;
-	train: StationArrivalWithStation;
+	train: PredictionWithStation;
 	size?: "sm" | "md";
 }) {
 	const navigation = useNavigation();
@@ -71,22 +72,22 @@ export default function PrimaryTrainButton({
 				} as never);
 			}}
 		>
-			<LineSymbol code={lineAbbr} />
-			<CarCapacitySymbol capacity={train.car || "?"} />
+			<LineSymbol routeId={line.route_id} />
+			<CarCapacitySymbol capacity={train.car_count || "?"} />
 			<View className="flex-1 flex-col items-start justify-start">
 				<View
 					className={`flex-row items-center justify-start ${
 						size === "sm" ? "gap-1" : "gap-2"
 					}`}
 				>
-					{size === "sm" && train.destinationName !== "LastTrain" ? (
+					{size === "sm" && train.destination_name !== "LastTrain" ? (
 						<Ionicons
 							name="flag"
 							size={16}
 							className="text-text-secondary"
 						/>
 					) : null}
-					{train.destinationName === "LastTrain" ? (
+					{train.destination_name === "LastTrain" ? (
 						<View className="flex-row items-center justify-center gap-1 bg-red-500 border-2 border-red-600 rounded-lg py-0.5 px-2">
 							<Text
 								className="text-white"
@@ -102,7 +103,7 @@ export default function PrimaryTrainButton({
 							weight="semiBold"
 							size={size === "sm" ? "sm" : "md"}
 						>
-							{train.destinationName}
+							{train.trip_headsign}
 						</Text>
 					)}
 				</View>
@@ -120,7 +121,8 @@ export default function PrimaryTrainButton({
 							numberOfLines={1}
 							ellipsizeMode="tail"
 						>
-							{train.station.name}
+							{train.station.stop_short_name ??
+								train.station.stop_name}
 						</Text>
 					</View>
 				)}

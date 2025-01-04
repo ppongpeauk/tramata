@@ -6,7 +6,7 @@ const app = new OpenAPIHono<GenericHono>();
 app.openapi(
 	createRoute({
 		method: "get",
-		path: "/{agency_id}/stops",
+		path: "/",
 		tags: ["stops"],
 		description: "Get stops by agency ID.",
 		summary: "Get stops by agency ID.",
@@ -51,7 +51,7 @@ app.openapi(
 app.openapi(
 	createRoute({
 		method: "get",
-		path: "/{agency_id}/stops/{stop_id}",
+		path: "/{stop_id}",
 		tags: ["stops"],
 		description: "Get a stop by agency ID and stop ID.",
 		summary: "Get a stop by agency ID and stop ID.",

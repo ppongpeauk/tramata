@@ -7,9 +7,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import Home, { HomeStack } from "./home";
 import More from "./more";
-import Line from "./line";
+import Line from "./rail-line";
 import { TouchableOpacity } from "react-native";
-import LineAlerts from "./line-alerts";
+import LineAlerts from "./route-alerts";
 import StationDetails from "./station-details";
 import StationOutage from "./station-outage";
 import SystemMap from "./system-map";
@@ -97,7 +97,7 @@ const RootStack = createNativeStackNavigator({
 			screen: More,
 			options: ({ navigation }) => ({}),
 		},
-		Line: {
+		RailLine: {
 			screen: Line,
 			initialParams: {
 				code: "RD",

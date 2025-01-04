@@ -33,6 +33,7 @@ import { useQuery } from "@tanstack/react-query";
 import LineSymbol from "@/components/line-symbol";
 import { LinearGradient } from "expo-linear-gradient";
 import { useColorScheme } from "nativewind";
+import { Stop } from "@/types/stop";
 
 export type TabDefinition = {
 	label: string;
@@ -60,8 +61,10 @@ export default function StationDetails() {
 	} = useQuery({
 		queryKey: ["station", id],
 		queryFn: async () => {
-			const response = await api.get(`/v1/stations/${id}`);
-			return response.data as Station;
+			const response = await api.get<Stop>(
+				`/v1/agency/WMATA_RAIL/stops/${id}?include_arrivals=true`
+			);
+			return response.data;
 		},
 		refetchInterval: 1000 * 15,
 	});
@@ -86,6 +89,7 @@ export default function StationDetails() {
 		navigation.setOptions({
 			headerTitle: title,
 			headerShadowVisible: false,
+			headerBackButtonDisplayMode: "minimal",
 			headerRight: () => (
 				<View className="flex-row items-center justify-center gap-4">
 					<TouchableOpacity>
@@ -148,27 +152,28 @@ export default function StationDetails() {
 								weight="semiBold"
 								size="md"
 							>
-								{stationData?.name}
+								{stationData?.stop_short_name ??
+									stationData?.stop_name}
 							</Text>
 							<Text
 								className="text-text-secondary text-left"
 								weight="medium"
 								size="sm"
 							>
-								{stationData?.address.city},{" "}
-								{stationData?.address.state}
+								{stationData?.address?.city},{" "}
+								{stationData?.address?.state}
 							</Text>
 						</View>
 						<View className="flex-row items-center justify-center h-full gap-2">
-							{stationData?.lines.map((line) => (
+							{stationData?.route_ids.map((id) => (
 								<LineSymbol
-									code={line}
+									routeId={id}
 									size={
-										stationData?.lines?.length > 2
+										stationData?.route_ids?.length > 2
 											? "md"
 											: "lg"
 									}
-									key={line}
+									key={id}
 								/>
 							))}
 						</View>
@@ -298,7 +303,7 @@ function ArrivalsTab({
 	refreshing,
 	onRefresh,
 }: {
-	station: Station;
+	station: Stop;
 	refreshing: boolean;
 	onRefresh: () => void;
 }) {
@@ -322,16 +327,20 @@ function ArrivalsTab({
 				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
 			}
 			renderItem={({ item, index }) => {
-				const line = lines.find((line) => line.abbr === item.line);
+				const line = lines.find((line) => line.abbr === item.line_code);
 				if (!line) {
 					return null;
 				}
 
 				return (
 					<PrimaryTrainButton
-						lineAbbr={item.line}
+						lineAbbr={item.line_code}
 						train={{
 							...item,
+							station: {
+								...station,
+								predictions: [],
+							} as any,
 						}}
 						key={index}
 					/>
@@ -346,7 +355,7 @@ function OutagesTab({
 	refreshing,
 	onRefresh,
 }: {
-	station: Station;
+	station: Stop;
 	refreshing: boolean;
 	onRefresh: () => void;
 }) {
@@ -382,7 +391,9 @@ function OutagesTab({
 						}}
 					>
 						<OutageUnitSymbol
-							unitType={item.unitType || "ESCALATOR"}
+							unitType={
+								item.unit_type as "ESCALATOR" | "ELEVATOR"
+							}
 						/>
 						<View>
 							<Text
@@ -390,7 +401,7 @@ function OutagesTab({
 								weight="semiBold"
 								size="sm"
 							>
-								{item.unitType === "ESCALATOR"
+								{item.unit_type === "ESCALATOR"
 									? "Escalator"
 									: "Elevator"}{" "}
 								Outage
@@ -400,7 +411,7 @@ function OutagesTab({
 								weight="medium"
 								size="xs"
 							>
-								{item.symptomDescription}
+								{item.symptom_description}
 							</Text>
 						</View>
 						<Ionicons

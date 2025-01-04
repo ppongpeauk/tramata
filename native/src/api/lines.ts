@@ -1,36 +1,29 @@
 import { api } from "@/utils/web";
-import { Alert } from "./alerts";
+import { Route } from "@/types/route";
 
-export type APILine = {
-	lineCode: string;
-	displayName: string;
-	startStationCode: string;
-	endStationCode: string;
-	internalDestinations: string[];
-	startStation: Station;
-	endStation: Station;
-	stations: Station[];
-	alerts: Alert[];
-};
+export interface APIAgencyResponse {
+	agency_id: string;
+	agency_name: string;
+	agency_url: string;
+	agency_timezone: string;
+	agency_lang: string;
+	agency_phone: string;
+	agency_fare_url: string;
+	agency_email: string;
+	routes: Route[];
+}
 
-type Station = {
-	code: string;
-	name: string;
-	stationTogether: string[];
-	lineCodes: string[];
-	lat: number;
-	lon: number;
-	address: Address;
-};
+export async function getLines(): Promise<APIAgencyResponse> {
+	const lines = await api.get<APIAgencyResponse>("/v1/agency/WMATA_RAIL");
+	// filter out SHUTTLE route
+	const data = lines.data;
+	data.routes = data.routes.filter((route) => route.route_id !== "SHUTTLE");
+	return data;
+}
 
-type Address = {
-	street: string;
-	city: string;
-	state: string;
-	zip: string;
-};
-
-export async function getLines(): Promise<APILine[]> {
-	const lines = await api.get("/v1/lines");
-	return lines.data;
+export async function getLine(routeId: string): Promise<Route> {
+	const line = await api.get<Route>(
+		`/v1/agency/WMATA_RAIL/routes/${routeId}`
+	);
+	return line.data;
 }

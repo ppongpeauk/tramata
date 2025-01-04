@@ -7,8 +7,8 @@ const app = new OpenAPIHono<GenericHono>();
 app.openapi(
 	createRoute({
 		method: "get",
-		path: "/{agency_id}/routes/{route_id}",
-		tags: ["route"],
+		path: "/{route_id}",
+		tags: ["agency", "route"],
 		description: "Get a route by ID.",
 		summary: "Get a route by ID.",
 		request: {
@@ -36,7 +36,7 @@ app.openapi(
 	}),
 	async (c) => {
 		const routeModel = new RouteModel(c);
-		const route = routeModel.findById(c.req.param("route_id"));
+		const route = await routeModel.findById(c.req.param("route_id"));
 		return c.json(route);
 	}
 );

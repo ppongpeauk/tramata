@@ -73,7 +73,7 @@ export const TrainWebsocketProvider = ({
 		};
 
 		ws.onerror = (error) => {
-			console.error("WebSocket error:", error);
+			console.debug("WebSocket error:", error);
 		};
 
 		ws.onclose = () => {
@@ -85,7 +85,7 @@ export const TrainWebsocketProvider = ({
 	};
 
 	useEffect(() => {
-		connectWebSocket(); // Initial connection
+		// connectWebSocket(); // Initial connection
 	}, []);
 
 	return (
