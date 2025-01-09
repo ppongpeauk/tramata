@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { pluralize } from "@/utils/string";
 import { getTrainPositions } from "@/utils/trains";
 import { TrainPositions } from "@/types/train";
+import { buttonHaptics } from "@/utils/haptics";
 
 export default function Line() {
 	const navigation = useNavigation();
@@ -57,11 +58,12 @@ export default function Line() {
 				return (
 					<View className="flex-row items-center gap-4">
 						<TouchableOpacity
-							onPress={() =>
+							onPress={() => {
+								buttonHaptics();
 								navigation.navigate("LineAlerts", {
 									alerts: data?.alerts,
-								} as never)
-							}
+								} as never);
+							}}
 						>
 							{!data?.alerts.length ? (
 								<Ionicons

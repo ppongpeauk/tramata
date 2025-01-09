@@ -45,7 +45,7 @@ export async function fetchAndSaveMap() {
 		console.log("Map updated.");
 		return localMapPath;
 	} catch (error) {
-		console.error("Unable to fetch map from WMATA. Using cached map.");
+		console.debug("Unable to fetch map from WMATA. Using cached map.");
 		if (localMetadata.exists) {
 			console.log("Using cached map.");
 			return localMapPath;

@@ -6,9 +6,9 @@ export const transformEta = (eta: number | string) => {
 	if (typeof eta === "number") {
 		return `${eta} min`;
 	} else if (eta === "ARR") {
-		return "Arriving";
+		return "ARR";
 	} else if (eta === "BRD") {
-		return "Boarding";
+		return "BRD";
 	} else {
 		return "Unknown";
 	}

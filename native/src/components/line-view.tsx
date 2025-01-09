@@ -7,12 +7,12 @@ import { buttonHaptics } from "@/utils/haptics";
 import { getDistance } from "@/utils/map";
 import map from "@/constants/map";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTrainWebsocket } from "@/contexts/websocket";
-import mapping from "@/constants/mapping";
-import { Alert } from "@/api/alerts";
 import { Route } from "@/types/line";
 import { TrainPositions } from "@/types/train";
 import { transformEta } from "@/utils/string";
+import { haversineDistance } from "@/utils/distance";
+import CarCapacitySymbol from "./car-capacity-symbol";
+import LineSymbol from "./line-symbol";
 
 export default function LineView({
 	line,
@@ -38,78 +38,104 @@ export default function LineView({
 
 	// Calculate train positions relative to the line view
 	const trainPositionsOnLine = useMemo(() => {
-		if (!trainPositions[line.route_id]) return [];
+		if (!trainPositions?.[line?.route_id]) return [];
 		return trainPositions[line.route_id].map((train) => {
 			const { vehicle_lat, vehicle_lon } = train;
 
-			// Find the closest stations before and after the train
-			let beforeStation = data.stops[0];
-			let afterStation = data.stops[1];
+			// Special case: If train is at a station
+			if (train.location_name && train.location_code) {
+				const stationIndex = data.stops.findIndex(
+					(stop) => stop.stop_id === train.location_code
+				);
+				if (stationIndex !== -1) {
+					// Calculate exact station position
+					let position = 0;
+					for (let i = 0; i < stationIndex; i++) {
+						position += lineHeights.get(i) ?? 0;
+					}
+					return {
+						id: train.train_id,
+						position,
+						direction: train.direction_num,
+						car_count: train.car_count,
+						eta: train.eta,
+					};
+				}
+			}
+
+			// Find the closest station pair that the train is between
+			let minTotalDistance = Infinity;
+			let bestBeforeStation = data.stops[0];
+			let bestAfterStation = data.stops[1];
+			let bestSegmentStart = 0;
+			let bestPosition = 0;
 			let totalDistance = 0;
-			let segmentStart = 0;
 
 			for (let i = 0; i < data.stops.length - 1; i++) {
 				const station1 = data.stops[i];
 				const station2 = data.stops[i + 1];
 
-				const distanceToStation1 = getDistance(
+				const distanceToStation1 = haversineDistance(
 					vehicle_lat,
 					vehicle_lon,
 					station1.stop_lat,
 					station1.stop_lon
 				);
-				const distanceToStation2 = getDistance(
+				const distanceToStation2 = haversineDistance(
 					vehicle_lat,
 					vehicle_lon,
 					station2.stop_lat,
 					station2.stop_lon
 				);
-				const stationDistance = getDistance(
+				const stationDistance = haversineDistance(
 					station1.stop_lat,
 					station1.stop_lon,
 					station2.stop_lat,
 					station2.stop_lon
 				);
 
+				// If very close to a station (within 50 meters), snap to it
+				if (distanceToStation1 < 50) {
+					return {
+						id: train.train_id,
+						position: totalDistance,
+						direction: train.direction_num,
+						car_count: train.car_count,
+						eta: train.eta,
+					};
+				}
+
+				// Check if train is between these stations (with some tolerance)
+				const totalPathDistance =
+					distanceToStation1 + distanceToStation2;
 				if (
-					distanceToStation1 + distanceToStation2 <=
-					stationDistance * 1.1
+					totalPathDistance < minTotalDistance &&
+					totalPathDistance <= stationDistance * 1.2
 				) {
-					beforeStation = station1;
-					afterStation = station2;
-					segmentStart = totalDistance;
-					break;
+					minTotalDistance = totalPathDistance;
+					bestBeforeStation = station1;
+					bestAfterStation = station2;
+					bestSegmentStart = totalDistance;
+
+					// Calculate position using the ratio of distances
+					const segmentLength = lineHeights.get(i) ?? 0;
+					const progressRatio = distanceToStation1 / stationDistance;
+					bestPosition =
+						bestSegmentStart + segmentLength * progressRatio;
 				}
 
 				totalDistance += lineHeights.get(i) ?? 0;
 			}
 
-			// Calculate position along the line segment
-			const segmentLength =
-				lineHeights.get(data.stops.indexOf(beforeStation)) ?? 0;
-			const ratio =
-				getDistance(
-					vehicle_lat,
-					vehicle_lon,
-					beforeStation.stop_lat,
-					beforeStation.stop_lon
-				) /
-				getDistance(
-					beforeStation.stop_lat,
-					beforeStation.stop_lon,
-					afterStation.stop_lat,
-					afterStation.stop_lon
-				);
-
 			return {
 				id: train.train_id,
-				position: segmentStart + segmentLength * ratio,
+				position: bestPosition,
 				direction: train.direction_num,
 				car_count: train.car_count,
 				eta: train.eta,
 			};
 		});
-	}, [trainPositions, data.stops, lineHeights, line.id]);
+	}, [trainPositions, data.stops, lineHeights, line.route_id]);
 
 	// Animate train positions
 	useEffect(() => {
@@ -161,15 +187,15 @@ export default function LineView({
 	}, [data]);
 
 	return (
-		<View className="flex-1 px-4" style={{ height: sumOfHeights + 48 }}>
+		<View className="px-4" style={{ height: sumOfHeights }}>
 			<View className="flex-row justify-start items-center">
 				<View className="relative flex-col items-center">
 					{data?.stops.map((stop, index) => {
 						const topBottomRounded =
 							index === 0
-								? "rounded-t-lg"
+								? "rounded-t-full"
 								: index === data.stops.length - 1
-								? "rounded-b-lg"
+								? "rounded-b-full"
 								: "";
 						const yPosition = Array.from(lineHeights.values())
 							.slice(0, index)
@@ -185,11 +211,14 @@ export default function LineView({
 
 						return (
 							<View
-								className="absolute flex flex-row items-center justify-center z-5 w-full"
+								className="absolute flex flex-row items-start justify-center z-5 w-full"
 								key={index}
 								style={{
 									top: yPosition,
-									height: lineHeights.get(index),
+									height:
+										index === data.stops.length - 1
+											? 28
+											: lineHeights.get(index),
 									zIndex: 5,
 									elevation: 5,
 								}}
@@ -209,8 +238,8 @@ export default function LineView({
 											line: line,
 										} as never);
 									}}
-									className="absolute rounded-full bg-white border-4 border-black w-8 h-8"
-									style={{ zIndex: 10, elevation: 10 }}
+									className="absolute rounded-full bg-white border-4 border-black w-8 h-8 z-50"
+									style={{ zIndex: 50, elevation: 50 }}
 								/>
 								<View className="absolute flex-col items-start justify-center z-5 right-0">
 									<Text
@@ -253,7 +282,7 @@ export default function LineView({
 						return (
 							<Animated.View
 								key={train.id}
-								className="absolute flex-row items-center justify-center z-10"
+								className="absolute flex-row items-center justify-center"
 								style={{
 									transform: [
 										{
@@ -308,13 +337,14 @@ export function TrainIndicator({
 	return (
 		<View className="flex-row items-center mb-1 gap-2">
 			{direction === 1 ? (
-				<View>
+				<View className="flex-col gap-1">
 					<Text className="text-text" size="sm" weight="bold">
 						{transformEta(eta)}
 					</Text>
-					<Text className="text-text" size="xs" weight="medium">
-						{carCount}-car
-					</Text>
+					<View className="flex-row items-center justify-center gap-1">
+						<LineSymbol routeId={line.route_id} size="sm" />
+						<CarCapacitySymbol capacity={carCount} size="sm" />
+					</View>
 				</View>
 			) : null}
 
@@ -326,8 +356,8 @@ export function TrainIndicator({
 						className={line.textColor}
 					/>
 				) : null}
-				<Ionicons
-					name="train-sharp"
+				<MaterialCommunityIcons
+					name="train"
 					size={20}
 					className={line.textColor}
 				/>
@@ -341,13 +371,14 @@ export function TrainIndicator({
 			</View>
 
 			{direction === 2 ? (
-				<View>
+				<View className="flex-col gap-1">
 					<Text className="text-text" size="sm" weight="bold">
 						{transformEta(eta)}
 					</Text>
-					<Text className="text-text" size="xs" weight="medium">
-						{carCount}-car
-					</Text>
+					<View className="flex-row items-center justify-center gap-1">
+						<LineSymbol routeId={line.route_id} size="sm" />
+						<CarCapacitySymbol capacity={carCount} size="sm" />
+					</View>
 				</View>
 			) : null}
 		</View>

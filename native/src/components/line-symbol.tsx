@@ -2,7 +2,6 @@ import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { lines } from "@/constants/lines";
 import { useNavigation } from "@react-navigation/native";
-import { Route } from "@/api/lines";
 
 export default function LineSymbol({
 	routeId,
@@ -10,11 +9,18 @@ export default function LineSymbol({
 	pressable = false,
 }: {
 	routeId: string;
-	size?: "md" | "lg";
+	size?: "sm" | "md" | "lg";
 	pressable?: boolean;
 }) {
 	const navigation = useNavigation();
-	const sizeClass = size === "md" ? "w-8 h-8" : "w-12 h-12";
+	const sizeClass =
+		size === "sm"
+			? "w-6 h-6"
+			: size === "md"
+			? "w-8 h-8"
+			: size === "lg"
+			? "w-12 h-12"
+			: "";
 	const line = lines.find((line) => line.route_id === routeId);
 
 	if (!line) {
@@ -43,7 +49,7 @@ export default function LineSymbol({
 			<Text
 				className="text-white"
 				weight="bold"
-				size={size === "md" ? "xs" : "md"}
+				size={size === "sm" ? "xxs" : size === "md" ? "xs" : "md"}
 			>
 				{line.abbr}
 			</Text>
